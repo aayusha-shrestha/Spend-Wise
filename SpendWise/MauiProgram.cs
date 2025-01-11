@@ -1,4 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
+using SpendWise.Model;
+using SpendWise.Services;
+using SpendWise.Services.Interface;
+
 
 namespace SpendWise
 {
@@ -13,11 +18,14 @@ namespace SpendWise
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-
             builder.Services.AddMauiBlazorWebView();
-
+            // Registers services as a scoped dependency.
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ITransactionService, TransactionService>();
+            // Adds MudBlazor services to the dependency injection container.
+            builder.Services.AddMudServices();
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 

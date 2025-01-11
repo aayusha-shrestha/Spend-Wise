@@ -1,0 +1,232 @@
+﻿@page "/transactions"
+
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Transactions</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddTransactionDialog">
+        <span class="oi oi-plus" /> Add
+    </button>
+</nav>
+
+<!-- Filter -->
+<div class="d-flex align-items-center gap-3">
+    <input type="search" class="form-control search" placeholder="Search by title" @oninput="SearchTransactionTitle" />
+    <!-- Type Filter -->
+    <select class="form-control" @onchange="FilterByTransactionType">
+        <option value="">Select Transaction Type</option>
+        @foreach (var type in Enum.GetValues(typeof(TransactionType)).Cast<TransactionType>())
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <!-- Tag Filter -->
+    <select class="form-control" @onchange="FilterByTag">
+        <option value="">Select Tag</option>
+        @foreach (var tag in Enum.GetValues(typeof(DefaultTag)).Cast<DefaultTag>())
+        {
+            <option value="@tag">@tag</option>
+        }
+    </select>
+    <input type="date" class="form-control" @onchange="FilterByDateRange" />
+    <input type="date" class="form-control" @onchange="FilterBySpecificDate" />
+</div>
+<!-- Filter Ends -->
+
+<!--Transaction List-->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Label</th>
+            <th>Amount</th>
+            <th>Tag</th>
+            <th>Notes</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in _transactions)
+        {
+            <tr>
+                <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                <td>@transaction.Title</td>
+                <td>@transaction.Type</td>
+                <td>@transaction.Amount</td>
+                <td>@transaction.Tags</td>
+                <td>@transaction.Notes</td>
+                <td>
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteTransactionDialog(transaction)">
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!--Transaction List End-->
+
+<!-- Add Transaction Dialog -->
+<MudDialog @ref="AddTransactionDialog">
+    <DialogContent>
+        <MudForm @bind-IsValid="IsFormValid" @ref="TransactionForm">
+            <MudTextField Label="Title" @bind-Value="_newTransaction.Title" Required="true" />
+            <MudNumericField Label="Amount" @bind-Value="_newTransaction.Amount" Required="true" />
+            <MudTextField Label="Type" @bind-Value="_newTransaction.Type" Required="true" />
+            <MudTextField Label="Tags" @bind-Value="_newTransaction.Tags" />
+            <MudTextField Label="Notes" @bind-Value="_newTransaction.Notes" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="SaveTransaction" Disabled="!IsFormValid">Save</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="CancelDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Add Transaction Dialog End -->
+
+<!-- Delete Transaction Dialog -->
+<MudDialog @ref="DeleteTransactionDialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Are you sure you want to delete this transaction?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="DeleteTransaction">Delete</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelDeleteDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Delete Transaction Dialog End -->
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+    private List<Transaction> _transactions { get; set; }
+    private string _tabFilter = "All";
+    private string _sortBy = "createdAt";
+    private string _sortDirection = "ascending";
+    // Add Transaction
+    private Transaction _newTransaction = new Transaction();
+    private bool IsFormValid;
+    private MudForm TransactionForm;
+    private MudDialog AddTransactionDialog;
+    // Delete Transaction
+    private MudDialog DeleteTransactionDialog;
+    private Transaction _transactionToDelete;
+
+    protected override void OnInitialized()
+    {
+        if (_globalState?.CurrentUser == null)
+        {
+            Nav.NavigateTo("/login");
+        }
+        _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+    }
+
+    // Search by title
+    private void SearchTransactionTitle(ChangeEventArgs e)
+    {
+        var searchTerm = e.Value.ToString();
+        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            //ToList() method converts the filtered collection IEnumerable<Transaction> into a List<Transaction>
+            _transactions = allTransactions.Where(t =>
+                t.Title.ToLower().Contains(searchTerm.ToLower())).ToList();
+        }
+        else
+        {
+            _transactions = allTransactions;
+        }
+    }
+
+    // Filter by Transaction Type
+    private void FilterByTransactionType(ChangeEventArgs e)
+    {
+        var selectedType = e.Value.ToString();
+        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+        if (!string.IsNullOrEmpty(selectedType))
+        {
+            _transactions = allTransactions.Where(t => t.Type.ToString() == selectedType).ToList();
+        }
+        else
+        {
+            _transactions = allTransactions;
+        }
+    }
+
+    // Filter by Tag
+    private void FilterByTag(ChangeEventArgs e)
+    {
+        var selectedTag = e.Value.ToString();
+        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+        if (!string.IsNullOrEmpty(selectedTag))
+        {
+            _transactions = allTransactions.Where(t => t.Tags.ToString() == selectedTag).ToList();
+        }
+        else
+        {
+            _transactions = allTransactions;
+        }
+    }
+
+    // Filter by Date Range
+    private void FilterByDateRange(ChangeEventArgs e)
+    {
+        var selectedDate = DateTime.Parse(e.Value.ToString());
+        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+        _transactions = allTransactions.Where(t => t.CreatedAt >= selectedDate).ToList();
+    }
+
+    // Filter by Specific Date
+    private void FilterBySpecificDate(ChangeEventArgs e)
+    {
+        var selectedDate = DateTime.Parse(e.Value.ToString());
+        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+        _transactions = allTransactions.Where(t => t.CreatedAt.Date == selectedDate.Date).ToList();
+    }
+
+    // Add Transaction
+    private async void OpenAddTransactionDialog()
+    {
+        _newTransaction = new Transaction();
+        await AddTransactionDialog.ShowAsync();
+    }
+
+    private void CancelDialog()
+    {
+        AddTransactionDialog.CloseAsync();
+    }
+
+    private void SaveTransaction()
+    {
+        if (!IsFormValid) return;
+
+        TransactionService.CreateTransaction(_globalState.CurrentUser.Id,_newTransaction);
+        _transactions.Add(_newTransaction);
+        AddTransactionDialog.CloseAsync();
+    }
+    // Add Transaction Ends
+
+    // Delete Transaction
+    private async void OpenDeleteTransactionDialog(Transaction transaction)
+    {
+        _transactionToDelete = transaction;
+        await DeleteTransactionDialog.ShowAsync();
+    }
+
+    private void CancelDeleteDialog()
+    {
+        DeleteTransactionDialog.CloseAsync();
+    }
+
+    private void DeleteTransaction()
+    {
+        if (_transactionToDelete == null) return;
+        _transactions = TransactionService.DeleteTransaction(_globalState.CurrentUser.Id, _transactionToDelete.Id);
+        DeleteTransactionDialog.CloseAsync();
+    }
+    // Delete Transaction Ends
+}

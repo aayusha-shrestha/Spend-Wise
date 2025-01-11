@@ -1,17 +1,30 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor
+@using SpendWise.Model
+@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudPopoverProvider />
+
+@* For dialogs *@
+<MudDialogProvider />
+
+@* For snackbars *@
+<MudSnackbarProvider />
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+    @if (_globalState != null && _globalState.CurrentUser != null)
+    {
+        <div class="sidebar">
+            <NavMenu Username="@_globalState.CurrentUser.Username" LogoutHandler="LogoutHandler" />
         </div>
-
+    }
+    <main>
         <article class="content px-4">
-            @Body
+            <CascadingValue Value="@_globalState">
+                @Body
+            </CascadingValue>
         </article>
     </main>
 </div>
+
+
