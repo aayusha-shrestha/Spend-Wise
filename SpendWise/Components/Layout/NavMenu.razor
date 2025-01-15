@@ -1,32 +1,82 @@
 ﻿@using SpendWise.Model
 <div class="top-row ps-3 navbar navbar-light">
-    <div class="container-fluid">
+    <div class="container-fluid navlink">
         <NavLink class="navbar-brand" href="/dashboard">
             Dashboard
         </NavLink>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid navlink">
         <NavLink class="navbar-brand" href="/transactions">
             Transactions
         </NavLink>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid navlink">
         <NavLink class="navbar-brand" href="/debts">
             Debts
         </NavLink>
     </div>
+    <button class="" @onclick="ShowLogoutConfirmation">
+        Logout
+    </button>
 </div>
 
+@if (IslogOut)
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display: block; background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: auto;">
+        <div class="modal-dialog" role="document" style="margin-top: 20%; margin-left: auto; margin-right: auto; max-width: 400px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Logout</h5>
+                    <button type="button" class="close" @onclick="HideLogoutConfirmation">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to logout?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideLogoutConfirmation">No</button>
+                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
     [Parameter]
     public string Username { get; set; }
     [Parameter]
     public EventCallback LogoutHandler { get; set; }
+    private bool IslogOut { get; set; } = false;
 
     private bool _collapseNavMenu { get; set; } = true;
 
     private void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    private void Logout()
+    {
+        if (_globalState != null)
+        {
+            _globalState.CurrentUser = null;
+        }
+        Nav.NavigateTo("/login");
+        StateHasChanged();
+        HideLogoutConfirmation();
+    }
+
+    private void ShowLogoutConfirmation()
+    {
+        IslogOut = true;
+    }
+
+    private void HideLogoutConfirmation()
+    {
+        IslogOut = false;
     }
 }

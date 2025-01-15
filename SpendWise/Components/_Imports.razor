@@ -11,9 +11,13 @@
 @using SpendWise.Components
 @using SpendWise.Model
 @using SpendWise.Services.Interface
+@using SpendWise.Utilities
 @using MudBlazor.Services
 @using MudBlazor
 
+@inject ISnackbar Snackbar
 @inject NavigationManager Nav
 @inject IUserService UserService
 @inject ITransactionService TransactionService
+@inject IDebtService DebtService
+@inject IBalanceService BalanceService

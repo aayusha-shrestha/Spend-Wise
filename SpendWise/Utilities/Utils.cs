@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using SpendWise.Model;
 
 namespace SpendWise.Utilities
 {
@@ -42,16 +43,36 @@ namespace SpendWise.Utilities
             return CryptographicOperations.FixedTimeEquals(inputHash, hash);
         }
 
+        // Handle currency formatting
+        public static string GetFormattedAmount(decimal amount, Currency currency)
+        {
+            switch (currency)
+            {
+                case Currency.NPR:
+                    return $"Rs {amount}";
+                case Currency.USD:
+                    return $"${amount}";
+                default:
+                    return $"{amount}";
+            }
+        }
+
         // File path where the users.json file is stored in the app's local data directory
         public static string GetAppUsersFilePath()
         {
             return Path.Combine(FileSystem.AppDataDirectory, "users.json");
         }
 
-        // File path where the transactions.json file is stored in the app's local data directory
+        // File path where the userId_transactions.json file is stored in the app's local data directory
         public static string GetTransactionsFilePath(Guid userId)
         {
             return  Path.Combine(FileSystem.AppDataDirectory, userId.ToString() + "_transactions.json");
+        }
+
+        // File path where the userId_debts.json file is stored in the app's local data directory
+        public static string GetDebtsFilePath(Guid userId)
+        {
+            return Path.Combine(FileSystem.AppDataDirectory, userId.ToString() + "_debts.json");
         }
     }
 }

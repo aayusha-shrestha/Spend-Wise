@@ -4,21 +4,19 @@
 
 <MudThemeProvider />
 <MudPopoverProvider />
-
 @* For dialogs *@
 <MudDialogProvider />
-
 @* For snackbars *@
 <MudSnackbarProvider />
 
 <div class="page">
-    @if (_globalState != null && _globalState.CurrentUser != null)
+    @if (_globalState?.CurrentUser != null)
     {
         <div class="sidebar">
-            <NavMenu Username="@_globalState.CurrentUser.Username" LogoutHandler="LogoutHandler" />
+            <NavMenu/>
         </div>
     }
-    <main>
+    <main class="@(_globalState?.CurrentUser == null ? "" : "mainBody")" >
         <article class="content px-4">
             <CascadingValue Value="@_globalState">
                 @Body

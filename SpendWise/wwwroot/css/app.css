@@ -84,3 +84,117 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+.page{
+    height: 100%;
+    min-height: 100vh;
+}
+
+input:focus{
+    outline: none !important;
+    box-shadow: none !important;
+    border: 2px solid palegreen !important;
+}
+
+body{
+    position: relative
+}
+
+body::before {
+    content: '';
+    background-image: url('../dollarbg.png');
+    opacity: .7;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-size: cover;
+}
+
+body::after {
+    content: '';
+    background: rgba(0, 0, 0, 1);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-size: cover;
+    z-index: -1
+}
+
+.form-login, .register-body {
+    width: 500px;
+    position: absolute;
+    margin: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: fit-content;
+    padding: 24px;
+    border-radius: 16px;
+    background-color: #e6f5e5;
+}
+
+.form-login form, .register-body form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.btn:focus{
+    box-shadow: none !important;
+}
+
+.btn-primary {
+    background-color: #013220 !important;
+    color: white;
+    outline: none;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #013220 !important;
+    filter: brightness(.5);
+}
+
+.sidebar {
+    padding: 24px;
+    background-color: #7cac7b;
+    background-image: none !important;
+    box-shadow: 0px 0px 32px #919191;
+    position: relative !important;
+}
+
+.mainBody{
+    background: white;
+}
+
+.navbar{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.b-pih84fnsrm{
+    background-color: none;
+}
+
+.status-pending {
+    background-color: #fce3e4;
+    color: #d2282e;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.status-cleared {
+    background-color: #e6fae5;
+    color: #24871f;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-weight: bold;
+    text-align: center;
+}

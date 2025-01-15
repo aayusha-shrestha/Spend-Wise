@@ -26,7 +26,7 @@
             <option value="@tag">@tag</option>
         }
     </select>
-    <input type="date" class="form-control" @onchange="FilterByDateRange" />
+    <MudDateRangePicker PickerVariant="@_variant" @bind-DateRange="@_dateRange" Margin="Margin.Dense"/>
     <input type="date" class="form-control" @onchange="FilterBySpecificDate" />
 </div>
 <!-- Filter Ends -->
@@ -51,7 +51,7 @@
                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                 <td>@transaction.Title</td>
                 <td>@transaction.Type</td>
-                <td>@transaction.Amount</td>
+                <td>@Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)</td>
                 <td>@transaction.Tags</td>
                 <td>@transaction.Notes</td>
                 <td>
@@ -94,139 +94,3 @@
     </DialogActions>
 </MudDialog>
 <!-- Delete Transaction Dialog End -->
-
-@code {
-    [CascadingParameter]
-    private GlobalState _globalState { get; set; }
-    private List<Transaction> _transactions { get; set; }
-    private string _tabFilter = "All";
-    private string _sortBy = "createdAt";
-    private string _sortDirection = "ascending";
-    // Add Transaction
-    private Transaction _newTransaction = new Transaction();
-    private bool IsFormValid;
-    private MudForm TransactionForm;
-    private MudDialog AddTransactionDialog;
-    // Delete Transaction
-    private MudDialog DeleteTransactionDialog;
-    private Transaction _transactionToDelete;
-
-    protected override void OnInitialized()
-    {
-        if (_globalState?.CurrentUser == null)
-        {
-            Nav.NavigateTo("/login");
-        }
-        _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-    }
-
-    // Search by title
-    private void SearchTransactionTitle(ChangeEventArgs e)
-    {
-        var searchTerm = e.Value.ToString();
-        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-
-        if (!string.IsNullOrEmpty(searchTerm))
-        {
-            //ToList() method converts the filtered collection IEnumerable<Transaction> into a List<Transaction>
-            _transactions = allTransactions.Where(t =>
-                t.Title.ToLower().Contains(searchTerm.ToLower())).ToList();
-        }
-        else
-        {
-            _transactions = allTransactions;
-        }
-    }
-
-    // Filter by Transaction Type
-    private void FilterByTransactionType(ChangeEventArgs e)
-    {
-        var selectedType = e.Value.ToString();
-        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-
-        if (!string.IsNullOrEmpty(selectedType))
-        {
-            _transactions = allTransactions.Where(t => t.Type.ToString() == selectedType).ToList();
-        }
-        else
-        {
-            _transactions = allTransactions;
-        }
-    }
-
-    // Filter by Tag
-    private void FilterByTag(ChangeEventArgs e)
-    {
-        var selectedTag = e.Value.ToString();
-        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-
-        if (!string.IsNullOrEmpty(selectedTag))
-        {
-            _transactions = allTransactions.Where(t => t.Tags.ToString() == selectedTag).ToList();
-        }
-        else
-        {
-            _transactions = allTransactions;
-        }
-    }
-
-    // Filter by Date Range
-    private void FilterByDateRange(ChangeEventArgs e)
-    {
-        var selectedDate = DateTime.Parse(e.Value.ToString());
-        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-
-        _transactions = allTransactions.Where(t => t.CreatedAt >= selectedDate).ToList();
-    }
-
-    // Filter by Specific Date
-    private void FilterBySpecificDate(ChangeEventArgs e)
-    {
-        var selectedDate = DateTime.Parse(e.Value.ToString());
-        var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
-
-        _transactions = allTransactions.Where(t => t.CreatedAt.Date == selectedDate.Date).ToList();
-    }
-
-    // Add Transaction
-    private async void OpenAddTransactionDialog()
-    {
-        _newTransaction = new Transaction();
-        await AddTransactionDialog.ShowAsync();
-    }
-
-    private void CancelDialog()
-    {
-        AddTransactionDialog.CloseAsync();
-    }
-
-    private void SaveTransaction()
-    {
-        if (!IsFormValid) return;
-
-        TransactionService.CreateTransaction(_globalState.CurrentUser.Id,_newTransaction);
-        _transactions.Add(_newTransaction);
-        AddTransactionDialog.CloseAsync();
-    }
-    // Add Transaction Ends
-
-    // Delete Transaction
-    private async void OpenDeleteTransactionDialog(Transaction transaction)
-    {
-        _transactionToDelete = transaction;
-        await DeleteTransactionDialog.ShowAsync();
-    }
-
-    private void CancelDeleteDialog()
-    {
-        DeleteTransactionDialog.CloseAsync();
-    }
-
-    private void DeleteTransaction()
-    {
-        if (_transactionToDelete == null) return;
-        _transactions = TransactionService.DeleteTransaction(_globalState.CurrentUser.Id, _transactionToDelete.Id);
-        DeleteTransactionDialog.CloseAsync();
-    }
-    // Delete Transaction Ends
-}

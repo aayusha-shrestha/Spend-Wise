@@ -9,14 +9,14 @@ namespace SpendWise.Components.Layout
         //private GlobalState _globalState { get; set; }
         private GlobalState _globalState = new GlobalState();
 
-
         private void LogoutHandler()
         {
-            if (_globalState.CurrentUser == null)
+            if (_globalState?.CurrentUser != null)
             {
+                _globalState.CurrentUser = null;
                 Nav.NavigateTo("/login");
+                StateHasChanged();
             }
         }
-
     }
 }

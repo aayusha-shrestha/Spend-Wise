@@ -2,11 +2,10 @@
 
 <div class="form-login">
     <form class="text-center" @onsubmit="HandleLogin">
-        <img class="mb-4" src="/appicon.png" alt="" height="72">
         <h1 class="h3 mb-3 fw-normal">Please Login</h1>
 
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" @bind="User.Username" placeholder="Username" required/>
+            <input type="text" class="form-control auth-username" @bind="User.Username" placeholder="Username" required autofocus />
             <label for="floatingInput">Username</label>
         </div>
 

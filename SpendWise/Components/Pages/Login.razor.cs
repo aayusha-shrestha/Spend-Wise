@@ -36,7 +36,6 @@ public partial class Login: ComponentBase
             _globalState.CurrentUser = UserService.Login(User);
             if (_globalState.CurrentUser != null)
             {
-                Console.WriteLine(_globalState.CurrentUser);
                 Nav.NavigateTo("/dashboard");
             }
         }

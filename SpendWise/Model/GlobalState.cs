@@ -2,6 +2,6 @@
 
 public class GlobalState
 {
-    public User CurrentUser { get; set; }
+    public User? CurrentUser { get; set; }
 }
 

@@ -1,7 +1,89 @@
 ﻿@page "/debts"
 
-<h3>Debts</h3>
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Debts</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddTransactionDialog">
+        <span class="oi oi-plus" /> Add
+    </button>
+</nav>
 
-@code {
+<!--Debt List-->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Due Date</th>
+            <th>Source of Debt</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var debt in _debts)
+        {
+            <tr>
+                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
+                <td>@debt.SourceOfDebt</td>
+                <td>@Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
+                </td>
 
-}
+                <td>
+                    @if (debt.Status == 0)
+                    {
+                        <button type="button" @onclick="()=>OpenClearDebtDialog(debt)" class="btn btn-primary">
+                            <span class="oi oi-check" /> Clear
+                        </button>
+                    }
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteDebtDialog(debt)">
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!--Debt List End-->
+
+<!-- Add Debt Dialog -->
+<MudDialog @ref="AddDebtDialog">
+    <DialogContent>
+        <MudForm @bind-IsValid="IsFormValid" @ref="DebtForm">
+            <MudNumericField Label="Amount" @bind-Value="_newDebt.Amount" Required="true" />
+            <MudTextField Label="Source of Debt" @bind-Value="_newDebt.SourceOfDebt" Required="true" />
+            <MudDatePicker Label="Due Date" @bind-Date="_newDebt.DueDate" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="SaveTransaction" Disabled="!IsFormValid">Save</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="CancelDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Add Debt Dialog End -->
+
+<!-- Clear Debt Dialog -->
+<MudDialog @ref="ClearDebtDialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Are you sure you want to clear this debt?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="ClearDebt">Clear</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelClearDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Clear Debt Dialog End -->
+
+<!-- Delete Debt Dialog -->
+<MudDialog @ref="DeleteDebtDialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Are you sure you want to delete this debt?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="DeleteDebt">Delete</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelDeleteDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Delete Debt Dialog End -->
+
+<MudSnackbarProvider MaxDisplayedSnackbars="3" PreventDuplicates="true" Position="SnackbarPosition.TopCenter" />

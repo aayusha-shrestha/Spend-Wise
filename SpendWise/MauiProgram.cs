@@ -22,6 +22,8 @@ namespace SpendWise
             // Registers services as a scoped dependency.
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITransactionService, TransactionService>();
+            builder.Services.AddScoped<IDebtService, DebtService>();
+            builder.Services.AddScoped<IBalanceService, BalanceService>();
             // Adds MudBlazor services to the dependency injection container.
             builder.Services.AddMudServices();
 #if DEBUG

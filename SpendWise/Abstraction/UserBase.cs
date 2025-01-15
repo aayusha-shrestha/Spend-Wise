@@ -25,11 +25,11 @@ public abstract class UserBase
         return JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
     }
 
-    // Method to save user data to the users.json file
+    // Saves user data to the users.json file with pretty-printed JSON using WriteIndented.
     protected void SaveUsers(List<User> users)
     {
         // Serialize the list of User objects into a JSON string
-        var json = JsonSerializer.Serialize(users);
+        var json = JsonSerializer.Serialize(users, new JsonSerializerOptions { WriteIndented = true});
 
         // Write the JSON string to the users.json file
         File.WriteAllText(usersFilePath, json);

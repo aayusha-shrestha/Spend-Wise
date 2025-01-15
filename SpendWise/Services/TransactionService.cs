@@ -11,7 +11,7 @@ public class TransactionService: ITransactionService
     {
         string transactionsFilePath = Utils.GetTransactionsFilePath(userId);
 
-        var json = JsonSerializer.Serialize(transactions);
+        var json = JsonSerializer.Serialize(transactions, new JsonSerializerOptions { WriteIndented = true });
 
         // Save the transactions to json. If the file doesnt exist, File.WriteAllText will create it
         File.WriteAllText(transactionsFilePath, json);

@@ -68,7 +68,7 @@ public class UserService : UserBase, IUserService
             return false; // Registration failed: user already exists.
 
         // Add the new user to the list and save the updated list to the file.
-        _users.Add(new User { Username = user.Username, Password = user.Password });
+        _users.Add(new User { Username = user.Username, Password = user.Password, Currency = user.Currency });
         SaveUsers(_users);
         return true;
     }
