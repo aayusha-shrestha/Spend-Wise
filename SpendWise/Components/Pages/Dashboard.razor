@@ -1,71 +1,90 @@
 ﻿@page "/dashboard"
 
-Welcome @_globalState.CurrentUser.Username!
+Welcome @_globalState?.CurrentUser?.Username!
 
-<button class="btn btn-lg btn-secondary" @onclick="ShowLogoutConfirmation" style="position: fixed; top: 20px; right: 20px;">
-    Logout
-</button>
+<h2>Current Balance: @_balance</h2>
+<h2>Total Inflow: @_totalInflow</h2>
+<h2>Total Outflow: @_totalOutflow</h2>
+<h2>Pending Debt: @_totalPendingDebt</h2>
+<h2>Cleared Debt: @_totalClearedDebt</h2>
 
-<h2>Balance: 1000</h2>
+<!-- Top 5 Highest Transaction -->
+<h2>Top 5 Highest Transaction</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Label</th>
+            <th>Amount</th>
+            <th>Tag</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in _fiveHighestTransaction)
+        {
+            <tr>
+                <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                <td>@transaction.Title</td>
+                <td>@transaction.Type</td>
+                <td>@Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>@transaction.Tags</td>
+                <td>@transaction.Notes</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Top 5 Highest Transaction End -->
 
-<!-- Users List Table -->
-<!--
- @if (users.Any())
- {
-     <table class="table">
-         <thead>
-             <tr>
-                 <th>Date</th>
-                 <th>Action</th>
-             </tr>
-         </thead>
-         <tbody>
-             @foreach (var user in users)
-             {
-                 <tr>
-                     <td>@user.Username</td>
-                     <td>
-                         <button class="btn btn-danger" @onclick="() => DeleteUser(user.Username)">Delete</button>
-                     </td>
-                 </tr>
-             }
-         </tbody>
-     </table>
- }
- else
- {
-     <p>No users found.</p>
- }
+<!--Pending Debt List-->
+<h2>Pending Debts</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Due Date</th>
+            <th>Source of Debt</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var debt in _pendingDebts)
+        {
+            <tr>
+                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
+                <td>@debt.SourceOfDebt</td>
+                <td>@Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
+                </td>
 
- @if (!string.IsNullOrEmpty(Message))
- {
-     <div class="alert alert-info">
-         @Message
-     </div>
- }
-   -->
+                <td>
+                    @if (debt.Status == 0)
+                    {
+                        <button type="button" @onclick="()=>OpenClearDebtDialog(debt)" class="btn btn-primary">
+                            <span class="oi oi-check" /> Clear
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!--Pending Debt List End-->
+
+<!-- Clear Debt Dialog -->
+<MudDialog @ref="ClearDebtDialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Are you sure you want to clear this debt?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="ClearDebt">Clear</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelClearDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Clear Debt Dialog End -->
 
 
-@if (IslogOut)
-{
-    <div class="modal" tabindex="-1" role="dialog" style="display: block; background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: auto;">
-        <div class="modal-dialog" role="document" style="margin-top: 20%; margin-left: auto; margin-right: auto; max-width: 400px;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Logout</h5>
-                    <button type="button" class="close" @onclick="HideLogoutConfirmation">
-                        <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to logout?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="HideLogoutConfirmation">No</button>
-                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
 
