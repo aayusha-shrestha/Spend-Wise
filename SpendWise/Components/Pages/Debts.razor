@@ -11,9 +11,14 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Due Date</th>
-            <th>Source of Debt</th>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Transaction Type</th>
             <th>Amount</th>
+            <th>Source of Debt</th>
+            <th>Tag</th>
+            <th>Notes</th>
+            <th>Due Date</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -22,14 +27,19 @@
         @foreach (var debt in _debts)
         {
             <tr>
-                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
+                <td>@debt.CreatedAt.ToString("MMM dd, yyyy")</td>
                 <td>@debt.SourceOfDebt</td>
+                <td>@debt.Type</td>
                 <td>
                     @if (_globalState?.CurrentUser != null)
                     {
                         @Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)
                     }
                 </td>
+                <td>@debt.SourceOfDebt</td>
+                <td>@debt.Tags</td>
+                <td>@debt.Notes</td>
+                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
                 </td>
@@ -55,9 +65,12 @@
 <MudDialog @ref="AddDebtDialog">
     <DialogContent>
         <MudForm @bind-IsValid="IsFormValid" @ref="DebtForm">
+            <MudTextField Label="Title" @bind-Value="_newDebt.Title" Required="true" />
             <MudNumericField Label="Amount" @bind-Value="_newDebt.Amount" Required="true" />
             <MudTextField Label="Source of Debt" @bind-Value="_newDebt.SourceOfDebt" Required="true" />
-            <MudDatePicker Label="Due Date" @bind-Date="_newDebt.DueDate" />
+            <MudDatePicker Label="Due Date" @bind-Date="_newDebt.DueDate" Required="true" />
+            <MudTextField Label="Tags" @bind-Value="_newDebt.Tags" Required="true" />
+            <MudTextField Label="Notes" @bind-Value="_newDebt.Notes" />
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -91,4 +104,5 @@
 </MudDialog>
 <!-- Delete Debt Dialog End -->
 
+<!-- Snack Bar -->
 <MudSnackbarProvider MaxDisplayedSnackbars="3" PreventDuplicates="true" Position="SnackbarPosition.TopCenter" />

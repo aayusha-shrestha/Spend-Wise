@@ -63,7 +63,7 @@ Welcome @_globalState?.CurrentUser?.Username!
         <tr>
             <th>Date</th>
             <th>Title</th>
-            <th>Label</th>
+            <th>Transaction Type</th>
             <th>Amount</th>
             <th>Tag</th>
             <th>Notes</th>
@@ -95,9 +95,14 @@ Welcome @_globalState?.CurrentUser?.Username!
 <table class="table">
     <thead>
         <tr>
-            <th>Due Date</th>
-            <th>Source of Debt</th>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Transaction Type</th>
             <th>Amount</th>
+            <th>Source of Debt</th>
+            <th>Tag</th>
+            <th>Notes</th>
+            <th>Due Date</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -106,14 +111,19 @@ Welcome @_globalState?.CurrentUser?.Username!
         @foreach (var debt in _pendingDebts)
         {
             <tr>
-                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
+                <td>@debt.CreatedAt.ToString("MMM dd, yyyy")</td>
                 <td>@debt.SourceOfDebt</td>
+                <td>@debt.Type</td>
                 <td>
                     @if (_globalState?.CurrentUser != null)
                     {
                         @Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)
                     }
                 </td>
+                <td>@debt.SourceOfDebt</td>
+                <td>@debt.Tags</td>
+                <td>@debt.Notes</td>
+                <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
                 </td>

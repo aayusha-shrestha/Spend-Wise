@@ -74,5 +74,11 @@ namespace SpendWise.Utilities
         {
             return Path.Combine(FileSystem.AppDataDirectory, userId.ToString() + "_debts.json");
         }
+
+        // File path where the userId_tags.json file is stored in the app's local data directory
+        public static string GetTagsFilePath(Guid userId)
+        {
+            return Path.Combine(FileSystem.AppDataDirectory, userId.ToString() + "_tags.json");
+        }
     }
 }

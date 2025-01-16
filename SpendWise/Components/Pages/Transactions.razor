@@ -21,13 +21,13 @@
         }
     </select>
     <!-- Tag Filter -->
-    <select class="form-control" @onchange="FilterByTag">
+    @* <select class="form-control" @onchange="FilterByTag">
         <option value="">Select Tag</option>
         @foreach (var tag in Enum.GetValues(typeof(DefaultTag)).Cast<DefaultTag>())
         {
             <option value="@tag">@tag</option>
         }
-    </select>
+    </select> *@
     <MudDateRangePicker PickerVariant="@_variant" @bind-DateRange="@_dateRange" Margin="Margin.Dense"/>
     <input type="date" class="form-control" @onchange="FilterBySpecificDate" />
 </div>
@@ -39,7 +39,7 @@
         <tr>
             <th>Date</th>
             <th>Title</th>
-            <th>Label</th>
+            <th>Transaction Type</th>
             <th>Amount</th>
             <th>Tag</th>
             <th>Notes</th>
@@ -59,8 +59,24 @@
                         @Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)
                     }
                 </td>
-                <td>@transaction.Tags</td>
-                <td>@transaction.Notes</td>
+                <td>
+                    @if (transaction.Tags != null && transaction.Tags.Any())
+                    {
+                        @foreach (var tag in transaction.Tags)
+                        {
+                            <span>@tag</span>
+                            @if (tag != transaction.Tags.Last())
+                            {
+                                @:,&nbsp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+               <td>@(string.IsNullOrEmpty(transaction.Notes) ? "N/A" : transaction.Notes)</td>
                 <td>
                     <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteTransactionDialog(transaction)">
                         <span class="oi oi-delete" /> Delete
@@ -78,8 +94,21 @@
         <MudForm @bind-IsValid="IsFormValid" @ref="TransactionForm">
             <MudTextField Label="Title" @bind-Value="_newTransaction.Title" Required="true" />
             <MudNumericField Label="Amount" @bind-Value="_newTransaction.Amount" Required="true" />
-            <MudTextField Label="Type" @bind-Value="_newTransaction.Type" Required="true" />
-            <MudTextField Label="Tags" @bind-Value="_newTransaction.Tags" />
+            <MudSelect Label="Transaction Type" @bind-Value="_newTransaction.Type" Required="true">
+                <MudSelectItem Value="TransactionType.Credit">Credit</MudSelectItem>
+                <MudSelectItem Value="TransactionType.Debit">Debit</MudSelectItem>
+            </MudSelect>
+            @foreach (var tag in _tags)
+            {
+                <div>
+                    <input type="checkbox"
+                           id="@tag.Name"
+                           value="@tag.Name"
+                           checked="@GetCheckedState(tag.Name)"
+                           @onchange="(e) => storeTags(e, tag.Name)" />
+                    <label for="@tag.Name">@tag.Name</label>
+                </div>
+            }
             <MudTextField Label="Notes" @bind-Value="_newTransaction.Notes" />
         </MudForm>
     </DialogContent>

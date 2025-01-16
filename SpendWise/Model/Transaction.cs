@@ -6,7 +6,7 @@ public class Transaction
     public string Title { get; set; }
     public TransactionType Type { get; set; }
     public decimal Amount { get; set; }
-    public DefaultTag Tags { get; set; } = new();
+    public List<string> Tags { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

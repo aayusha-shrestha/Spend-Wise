@@ -54,8 +54,17 @@ public partial class Debts : ComponentBase
     {
         if (!IsFormValid) return;
 
-        DebtService.CreateDebt(_globalState.CurrentUser.Id, _newDebt);
-        _debts.Add(_newDebt);
+        try
+        {
+            DebtService.CreateDebt(_globalState.CurrentUser.Id, _newDebt);
+            _debts.Add(_newDebt);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+            Snackbar.Add(_errorMessage, Severity.Error);
+            return;
+        }
         AddDebtDialog.CloseAsync();
     }
 

@@ -31,10 +31,6 @@ public class TransactionService: ITransactionService
 
     public List<Transaction> CreateTransaction(Guid userId, Transaction transaction)
     {
-        //if (dueDate < DateTime.Today)
-        //{
-        //    throw new Exception("Due date must be in the future.");
-        //}
         // Get all transactions. If the file doesn't exist, it will return an empty list
         List<Transaction> transactions = GetAllTransactions(userId);
 

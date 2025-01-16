@@ -2,7 +2,8 @@
 
 public class Debt: Transaction
 {
-    public SourceOfDebt SourceOfDebt { get; set; }
+    public string SourceOfDebt { get; set; }
     public DateTime? DueDate { get; set; } = DateTime.Today;
     public DebtStatus Status { get; set; } = 0;
+    public TransactionType Type { get; set; } = TransactionType.Debt;
 }

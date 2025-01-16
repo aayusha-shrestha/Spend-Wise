@@ -11,12 +11,13 @@ public partial class Transactions : ComponentBase
     private GlobalState _globalState { get; set; }
     private List<Transaction> _transactions { get; set; }
     private string _balance { get; set; }
-
     // Add Transaction
     private Transaction _newTransaction = new Transaction();
     private bool IsFormValid;
     private MudForm TransactionForm;
     private MudDialog AddTransactionDialog;
+    private List<Tag> _tags = new List<Tag>();
+    private List<string> _selectedTags = new List<string>();
     // Delete Transaction
     private MudDialog DeleteTransactionDialog;
     private Transaction _transactionToDelete;
@@ -32,8 +33,38 @@ public partial class Transactions : ComponentBase
         {
             Nav.NavigateTo("/login");
         }
-        _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+        if (_globalState?.CurrentUser != null)
+        {
+            _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+        }
         GetUserBalance();
+        GetUserTags();
+    }
+
+    // Method to get the checked state for each tag
+    private bool GetCheckedState(string tagName)
+    {
+        return _selectedTags.Contains(tagName);
+    }
+
+    // This method handles checkbox state changes
+    private void storeTags(ChangeEventArgs e, string tagName)
+    {
+        var isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            // Add the tag name to the selected list
+            if (!_selectedTags.Contains(tagName))
+            {
+                _selectedTags.Add(tagName);
+            }
+        }
+        else
+        {
+            // Remove the tag name from the selected list
+            _selectedTags.Remove(tagName);
+        }
     }
 
     // Get current balance of user
@@ -50,6 +81,15 @@ public partial class Transactions : ComponentBase
         catch (Exception ex)
         {
             _errorMessage = "Error fetching balance.";
+        }
+    }
+
+    // Get All User Tags
+    private void GetUserTags()
+    {
+        if (_globalState?.CurrentUser != null)
+        {
+            _tags = TagService.GetUserTags(_globalState.CurrentUser.Id);
         }
     }
 
@@ -95,7 +135,7 @@ public partial class Transactions : ComponentBase
 
         if (!string.IsNullOrEmpty(selectedTag))
         {
-            _transactions = allTransactions.Where(t => t.Tags.ToString() == selectedTag).ToList();
+            _transactions = allTransactions.Where(t => t.Tags.Any(tag => tag == selectedTag)).ToList();
         }
         else
         {
@@ -150,9 +190,8 @@ public partial class Transactions : ComponentBase
         try
         {
             if (!IsFormValid) return;
-
             if (_newTransaction == null) return;
-
+            _newTransaction.Tags = _selectedTags;
             if (_globalState.CurrentUser != null)
             {
                 decimal totalBalance = BalanceService.GetBalance(_globalState.CurrentUser.Id);

@@ -1,6 +1,7 @@
 ﻿using SpendWise.Abstraction;
 using SpendWise.Model;
 using SpendWise.Services.Interface;
+using System.Text.Json;
 
 namespace SpendWise.Services;
 
@@ -67,10 +68,31 @@ public class UserService : UserBase, IUserService
         if (_users.Any(u => u.Username == user.Username))
             return false; // Registration failed: user already exists.
 
-        // Add the new user to the list and save the updated list to the file.
-        _users.Add(new User { Username = user.Username, Password = user.Password, Currency = user.Currency });
+        _users.Add(user);
         SaveUsers(_users);
+        // Seed the default tags for the user
+        SeedDefaultTags(user.Id); 
         return true;
+    }
+    private void SeedDefaultTags(Guid userId)
+    {
+        var defaultTags = new List<Tag>
+        {
+            new Tag { Name = "Yearly" },
+            new Tag { Name = "Monthly" },
+            new Tag { Name = "Food" },
+            new Tag { Name = "Drinks" },
+            new Tag { Name = "Clothes" },
+            new Tag { Name = "Gadgets" },
+            new Tag { Name = "Miscellaneous" },
+            new Tag { Name = "Fuel" },
+            new Tag { Name = "Rent" },
+            new Tag { Name = "EMI" },
+            new Tag { Name = "Party" }
+        };
+
+        TagService tagService = new TagService();
+        tagService.SeedDefaultTags(userId, defaultTags);
     }
 }
 

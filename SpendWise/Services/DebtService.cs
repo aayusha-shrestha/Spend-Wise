@@ -13,7 +13,7 @@ public class DebtService : IDebtService
 
         var json = JsonSerializer.Serialize(debts, new JsonSerializerOptions { WriteIndented = true });
 
-        // Save the transactions to json. If the file doesnt exist, File.WriteAllText will create it
+        // Save the debts to json. If the file doesnt exist, File.WriteAllText will create it.
         File.WriteAllText(debtsFilePath, json);
     }
     public List<Debt> GetAllDebts(Guid userId)
@@ -31,15 +31,15 @@ public class DebtService : IDebtService
 
     public List<Debt> CreateDebt(Guid userId, Debt debt)
     {
-        //if (dueDate < DateTime.Today)
-        //{
-        //    throw new Exception("Due date must be in the future.");
-        //}
-        // Get all transactions. If the file doesn't exist, it will return an empty list
+        if (debt.DueDate < DateTime.Today)
+        {
+            throw new Exception("Due date must be in the future.");
+        }
+
+        // Get all debts. If the file doesn't exist, it will return an empty list
         List<Debt> debts = GetAllDebts(userId);
 
         debts.Add(debt);
-
         SaveAllDebts(userId, debts);
         return debts;
     }

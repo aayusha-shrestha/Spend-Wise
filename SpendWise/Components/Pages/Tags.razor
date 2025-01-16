@@ -1,3 +1,54 @@
 ﻿@page "/tags"
 
-<h3>Tags</h3>
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Tags</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddTagDialog">
+        <span class="oi oi-plus" /> Add
+    </button>
+</nav>
+
+<!--Tags List-->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    @if (_tags != null)
+    {
+        <tbody>
+            @foreach (var tag in _tags)
+            {
+                <tr>
+                    <td>@tag.Name</td>
+                    <td>
+                        <button class="btn btn-outline-danger" type="button">
+                            <span class="oi oi-delete" /> Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    }
+</table>
+<!--Tags List End-->
+
+<!-- Add Tag Dialog -->
+<MudDialog @ref="AddTagDialog">
+    <DialogContent>
+        <MudDialogTitle>Add Tag</MudDialogTitle>
+        <MudForm @bind-IsValid="IsFormValid" @ref="TagForm">
+            <MudTextField Label="Tag" @bind-Value="_newTag.Name" Required="true" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="SaveTag" Disabled="!IsFormValid">Add</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="CancelDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Add Tag Dialog End -->
+
+<!-- Snack Bar -->
+<MudSnackbarProvider MaxDisplayedSnackbars="3" PreventDuplicates="true" Position="SnackbarPosition.TopCenter" />
+
