@@ -7,10 +7,6 @@ namespace SpendWise.Components.Pages;
 
 public partial class Dashboard :ComponentBase
 {
-    private int Index = -1;
-    public List<ChartSeries> Series = new List<ChartSeries>();
-    public string[] XAxisLabels = { "Inflow", "Outflow", "Debt" };
-
     [CascadingParameter]
     private GlobalState _globalState { get; set; }
     private List<User> users = new List<User>();
@@ -20,11 +16,13 @@ public partial class Dashboard :ComponentBase
     private string _balance { get; set; }
     private string _totalInflow { get; set; }
     private string _totalOutflow { get; set; }
+    private string _totalDebt { get; set; }
     private string _totalPendingDebt { get; set; }
     private string _totalClearedDebt { get; set; }
     private decimal _totalTransactionCount { get; set; }
-    // Highest, Lowest, Total Transaction and Debt
-
+    private int Index = -1;
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = { "Inflow", "Outflow", "Debt" };
     // Five Highest Transaction
     private List<Transaction> _fiveHighestTransaction { get; set; }
     // Pending Debt
@@ -42,12 +40,7 @@ public partial class Dashboard :ComponentBase
         CalculateDebt();
         GetTopFiveHighestTransactions();
         GetPendingDebts();
-        Series = new List<ChartSeries>
-        {
-            new ChartSeries { Name = "Highest", Data = new double[] { (double)920, (double)960, (double)320 } },
-            new ChartSeries { Name = "Lowest", Data = new double[] { (double)440, (double)160, (double)50 } },
-            new ChartSeries { Name = "Total", Data = new double[] { (double)1360, (double)1120, (double)370 } },
-        };
+        GenerateChartData();
     }
 
     private async Task<List<User>> GetAllUsers()
@@ -132,8 +125,10 @@ public partial class Dashboard :ComponentBase
                     decimal totalClearedDebt = allDebts
                         .Where(t => t.Status == DebtStatus.Cleared)
                         .Sum(t => t.Amount);
+                    decimal totalDebt = totalPendingDebt + totalClearedDebt;
                     _totalPendingDebt = Utils.GetFormattedAmount(totalPendingDebt, _globalState.CurrentUser.Currency);
                     _totalClearedDebt = Utils.GetFormattedAmount(totalClearedDebt, _globalState.CurrentUser.Currency);
+                    _totalDebt = Utils.GetFormattedAmount(totalDebt, _globalState.CurrentUser.Currency);
                 }
             }
         }
@@ -143,7 +138,47 @@ public partial class Dashboard :ComponentBase
         }
     }
 
-    // CalculateTransactionAndDebtStats
+    // Gennerate Chart Data
+    private void GenerateChartData()
+    {
+        if (_globalState?.CurrentUser != null)
+        {
+            // Fetch all transactions for the current user
+            var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+
+            if (allTransactions != null)
+            {
+                // Calculate Inflows
+                var inflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Credit).ToList();
+                var inflowHighest = inflowTransactions.Max(t => t.Amount);
+                var inflowLowest = inflowTransactions.Min(t => t.Amount);
+                var inflowTotal = inflowTransactions.Sum(t => t.Amount);
+
+                // Calculate Outflows
+                var outflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Debit).ToList();
+                var outflowHighest = outflowTransactions.Max(t => t.Amount);
+                var outflowLowest = outflowTransactions.Min(t => t.Amount);
+                var outflowTotal = outflowTransactions.Sum(t => t.Amount);
+
+                // Calculate Debts
+                var allDebts = DebtService.GetAllDebts(_globalState.CurrentUser.Id);
+                var debtHighest = allDebts?.Max(d => d.Amount) ?? 0;
+                var debtLowest = allDebts?.Min(d => d.Amount) ?? 0;
+                var debtTotal = allDebts?.Sum(d => d.Amount) ?? 0;
+
+                // Update chart data
+                Series = new List<ChartSeries>
+            {
+                new ChartSeries { Name = "Highest", Data = new double[] { (double)inflowHighest, (double)outflowHighest, (double)debtHighest } },
+                new ChartSeries { Name = "Lowest", Data = new double[] { (double)inflowLowest, (double)outflowLowest, (double)debtLowest } },
+                new ChartSeries { Name = "Total", Data = new double[] { (double)inflowTotal, (double)outflowTotal, (double)debtTotal } },
+            };
+
+                // Update X-axis labels
+                XAxisLabels = new[] { "Inflow", "Outflow", "Debt" };
+            }
+        }
+    }
 
     // pending debts
     private async void GetPendingDebts()
@@ -190,6 +225,7 @@ public partial class Dashboard :ComponentBase
                     GetUserBalance();
                     CalculateDebt();
                     GetPendingDebts();
+
                 }
             }
         }

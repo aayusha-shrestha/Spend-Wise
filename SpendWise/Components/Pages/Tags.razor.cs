@@ -14,6 +14,9 @@ public partial class Tags : ComponentBase
     private bool IsFormValid;
     private MudForm TagForm;
     private MudDialog AddTagDialog;
+    // Delete Tag
+    private MudDialog DeleteTagDialog;
+    private Tag _tagToDelete;
     // Error Message
     private string? _errorMessage = "";
 
@@ -63,5 +66,24 @@ public partial class Tags : ComponentBase
             return;
         }
         AddTagDialog.CloseAsync();
+    }
+
+    // Delete Tag
+    private async void OpenDeleteTagDialog(Tag tag)
+    {
+        _tagToDelete = tag;
+        await DeleteTagDialog.ShowAsync();
+    }
+
+    private void CancelDeleteDialog()
+    {
+        DeleteTagDialog.CloseAsync();
+    }
+
+    private void DeleteTag()
+    {
+        if (_tagToDelete == null) return;
+        _tags = TagService.DeleteTag(_globalState.CurrentUser.Id, _tagToDelete.Id);
+        DeleteTagDialog.CloseAsync();
     }
 }

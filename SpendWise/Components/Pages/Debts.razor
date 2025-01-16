@@ -1,11 +1,13 @@
 ﻿@page "/debts"
 
-<nav class="navbar navbar-light bg-light justify-content-between">
-    <h1 class="navbar-brand mb-0 h1">Debts</h1>
+<div class="d-flex justify-content-between mt-5 mb-5">
+    <div><h1 class="mb-0 h3">Debts</h1></div>
+    <div>
     <button class="btn btn-primary" type="button" @onclick="OpenAddTransactionDialog">
         <span class="oi oi-plus" /> Add
     </button>
-</nav>
+    </div>
+</div>
 
 <!--Debt List-->
 <table class="table">
@@ -37,8 +39,24 @@
                     }
                 </td>
                 <td>@debt.SourceOfDebt</td>
-                <td>@debt.Tags</td>
-                <td>@debt.Notes</td>
+                <td>
+                    @if (debt.Tags != null && debt.Tags.Any())
+                    {
+                        @foreach (var tag in debt.Tags)
+                        {
+                            <span>@tag</span>
+                            @if (tag != debt.Tags.Last())
+                            {
+                                @:,&nbsp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>@(string.IsNullOrEmpty(debt.Notes) ? "N/A" : debt.Notes)</td>
                 <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
@@ -64,12 +82,28 @@
 <!-- Add Debt Dialog -->
 <MudDialog @ref="AddDebtDialog">
     <DialogContent>
+        <MudDialogTitle Style="font-size: 1.5rem;">Add New Debt</MudDialogTitle>
         <MudForm @bind-IsValid="IsFormValid" @ref="DebtForm">
             <MudTextField Label="Title" @bind-Value="_newDebt.Title" Required="true" />
-            <MudNumericField Label="Amount" @bind-Value="_newDebt.Amount" Required="true" />
+            <MudNumericField Label="Amount" @bind-Value="_newDebt.Amount" Required="true" Min="0" />
             <MudTextField Label="Source of Debt" @bind-Value="_newDebt.SourceOfDebt" Required="true" />
             <MudDatePicker Label="Due Date" @bind-Date="_newDebt.DueDate" Required="true" />
-            <MudTextField Label="Tags" @bind-Value="_newDebt.Tags" Required="true" />
+            <div class="tags-container">
+                <label for="tags" class="tags-label">Tags</label>
+                <div class="checkbox-group">
+                    @foreach (var tag in _tags)
+                    {
+                        <div class="checkbox-item">
+                            <input type="checkbox"
+                                   id="@tag.Name"
+                                   value="@tag.Name"
+                                   checked="@GetCheckedState(tag.Name)"
+                                   @onchange="(e) => storeTags(e, tag.Name)" />
+                            <label for="@tag.Name">@tag.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
             <MudTextField Label="Notes" @bind-Value="_newDebt.Notes" />
         </MudForm>
     </DialogContent>

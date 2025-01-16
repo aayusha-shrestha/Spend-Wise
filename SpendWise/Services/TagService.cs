@@ -50,6 +50,22 @@ namespace SpendWise.Services
             tags.Add(newTag);
             SeedDefaultTags(userId, tags); // Save updated list
         }
+
+        // Delete tag
+        public List<Tag> DeleteTag(Guid userId, Guid id)
+        {
+            List<Tag> tags = GetUserTags(userId);
+            Tag tag = tags.FirstOrDefault(x => x.Id == id);
+
+            if (tag == null)
+            {
+                throw new Exception("We couldn't find the transaction you're looking for.");
+            }
+
+            tags.Remove(tag);
+            SaveAllTags(userId, tags);
+            return tags;
+        }
     }
 }
 

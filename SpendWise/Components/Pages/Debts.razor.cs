@@ -17,6 +17,8 @@ public partial class Debts : ComponentBase
     private bool IsFormValid;
     private MudForm DebtForm;
     private MudDialog AddDebtDialog;
+    private List<Tag> _tags = new List<Tag>();
+    private List<string> _selectedTags = new List<string>();
     // Clear Debt
     private MudDialog ClearDebtDialog;
     private Debt _debtToClear;
@@ -34,9 +36,47 @@ public partial class Debts : ComponentBase
         {
             Nav.NavigateTo("/login");
         }
-        _debts = DebtService.GetAllDebts(_globalState.CurrentUser.Id);
+        if (_globalState?.CurrentUser != null)
+        {
+            _debts = DebtService.GetAllDebts(_globalState.CurrentUser.Id);
+        }
+        GetUserTags();
     }
     #endregion
+    // Get All User Tags
+    private void GetUserTags()
+    {
+        if (_globalState?.CurrentUser != null)
+        {
+            _tags = TagService.GetUserTags(_globalState.CurrentUser.Id);
+        }
+    }
+
+    // Get the checked state for each tag
+    private bool GetCheckedState(string tagName)
+    {
+        return _selectedTags.Contains(tagName);
+    }
+
+    // Hande checkbox state changes
+    private void storeTags(ChangeEventArgs e, string tagName)
+    {
+        var isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            // Add the tag name to the selected list
+            if (!_selectedTags.Contains(tagName))
+            {
+                _selectedTags.Add(tagName);
+            }
+        }
+        else
+        {
+            // Remove the tag name from the selected list
+            _selectedTags.Remove(tagName);
+        }
+    }
 
     // Add Debt
     private async void OpenAddTransactionDialog()
@@ -53,7 +93,7 @@ public partial class Debts : ComponentBase
     private void SaveTransaction()
     {
         if (!IsFormValid) return;
-
+        _newDebt.Tags = _selectedTags;
         try
         {
             DebtService.CreateDebt(_globalState.CurrentUser.Id, _newDebt);

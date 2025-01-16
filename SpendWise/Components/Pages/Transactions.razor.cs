@@ -41,13 +41,13 @@ public partial class Transactions : ComponentBase
         GetUserTags();
     }
 
-    // Method to get the checked state for each tag
+    // Get the checked state for each tag
     private bool GetCheckedState(string tagName)
     {
         return _selectedTags.Contains(tagName);
     }
 
-    // This method handles checkbox state changes
+    // Hande checkbox state changes
     private void storeTags(ChangeEventArgs e, string tagName)
     {
         var isChecked = (bool)e.Value;
@@ -226,7 +226,6 @@ public partial class Transactions : ComponentBase
             throw new Exception("An error occurred while processing the transaction.", ex);
         }
     }
-
 
     // Delete Transaction
     private async void OpenDeleteTransactionDialog(Transaction transaction)

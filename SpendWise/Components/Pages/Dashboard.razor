@@ -3,7 +3,9 @@
 
 @page "/dashboard"
 
-Welcome @_globalState?.CurrentUser?.Username!
+<h2 style="color: #2C6B2F; padding: 20px 20px 30px 20px;">
+    Welcome @_globalState?.CurrentUser?.Username!
+</h2>
 
 <!-- Dashboard Statistics -->
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
@@ -22,6 +24,12 @@ Welcome @_globalState?.CurrentUser?.Username!
         </MudItem>
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center">@_balance</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Total Transactions</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Success">@_totalInflow</MudText>
                 <MudText Typo="Typo.caption" Align="Align.Center">Total Inflow</MudText>
             </MudCard>
@@ -30,6 +38,12 @@ Welcome @_globalState?.CurrentUser?.Username!
             <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Error">@_totalOutflow</MudText>
                 <MudText Typo="Typo.caption" Align="Align.Center">Total Outflow</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center">@_totalDebt</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Total Debt</MudText>
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="6" md="4" lg="3">
@@ -49,7 +63,7 @@ Welcome @_globalState?.CurrentUser?.Username!
 <!-- Dashboard Statistics End -->
 
 <!-- Bar Chart -->
-<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-11">
     <MudText Typo="Typo.h6" Class="mb-2 mt-4">Top Inflows, Outflows, and Debts</MudText>
     <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
     </MudChart>
@@ -57,7 +71,7 @@ Welcome @_globalState?.CurrentUser?.Username!
 <!-- Bar Chart End -->
 
 <!-- Top 5 Highest Transaction -->
-<h2>Top 5 Highest Transaction</h2>
+<h4 style="margin-top: 3rem;">Top 5 Highest Transaction</h4>
 <table class="table">
     <thead>
         <tr>
@@ -82,8 +96,24 @@ Welcome @_globalState?.CurrentUser?.Username!
                         @Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)
                     }
                 </td>
-                <td>@transaction.Tags</td>
-                <td>@transaction.Notes</td>
+                <td>
+                    @if (transaction.Tags != null && transaction.Tags.Any())
+                    {
+                        @foreach (var tag in transaction.Tags)
+                        {
+                            <span>@tag</span>
+                            @if (tag != transaction.Tags.Last())
+                            {
+                                @:,&nbsp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>@(string.IsNullOrEmpty(transaction.Notes) ? "N/A" : transaction.Notes)</td>
             </tr>
         }
     </tbody>
@@ -91,7 +121,7 @@ Welcome @_globalState?.CurrentUser?.Username!
 <!-- Top 5 Highest Transaction End -->
 
 <!--Pending Debt List-->
-<h2>Pending Debts</h2>
+<h4 style="margin-top: 3rem;">Pending Debts</h4>
 <table class="table">
     <thead>
         <tr>
@@ -121,8 +151,24 @@ Welcome @_globalState?.CurrentUser?.Username!
                     }
                 </td>
                 <td>@debt.SourceOfDebt</td>
-                <td>@debt.Tags</td>
-                <td>@debt.Notes</td>
+                <td>
+                    @if (debt.Tags != null && debt.Tags.Any())
+                    {
+                        @foreach (var tag in debt.Tags)
+                        {
+                            <span>@tag</span>
+                            @if (tag != debt.Tags.Last())
+                            {
+                                @:,&nbsp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @:N/A
+                    }
+                </td>
+                <td>@(string.IsNullOrEmpty(debt.Notes) ? "N/A" : debt.Notes)</td>
                 <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>

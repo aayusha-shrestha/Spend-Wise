@@ -1,13 +1,15 @@
 ﻿@page "/transactions"
 
-<nav class="navbar navbar-light bg-light justify-content-between">
-    <h1 class="navbar-brand mb-0 h1">Transactions</h1>
-    <button class="btn btn-primary" type="button" @onclick="OpenAddTransactionDialog">
-        <span class="oi oi-plus" /> Add
-    </button>
-</nav>
+<div class="d-flex justify-content-between mt-5 mb-5">
+    <div><h1 class="mb-0 h3">Transactions</h1></div>
+    <div>
+        <button class="btn btn-primary" type="button" @onclick="OpenAddTransactionDialog">
+            <span class="oi oi-plus" /> Add
+        </button>
+    </div>
+</div>
 
-<h2>Current Balance: @_balance</h2>
+<h4 style="margin-bottom: 1rem; color: #777777;">Current Balance: @_balance</h4>
 
 <!-- Filter -->
 <div class="d-flex align-items-center gap-3">
@@ -91,24 +93,30 @@
 <!-- Add Transaction Dialog -->
 <MudDialog @ref="AddTransactionDialog">
     <DialogContent>
+        <MudDialogTitle Style="font-size: 1.5rem;">Add New Transaction</MudDialogTitle>
         <MudForm @bind-IsValid="IsFormValid" @ref="TransactionForm">
             <MudTextField Label="Title" @bind-Value="_newTransaction.Title" Required="true" />
-            <MudNumericField Label="Amount" @bind-Value="_newTransaction.Amount" Required="true" />
+            <MudNumericField Label="Amount" @bind-Value="_newTransaction.Amount" Required="true" Min="0" />
             <MudSelect Label="Transaction Type" @bind-Value="_newTransaction.Type" Required="true">
                 <MudSelectItem Value="TransactionType.Credit">Credit</MudSelectItem>
                 <MudSelectItem Value="TransactionType.Debit">Debit</MudSelectItem>
             </MudSelect>
-            @foreach (var tag in _tags)
-            {
-                <div>
-                    <input type="checkbox"
-                           id="@tag.Name"
-                           value="@tag.Name"
-                           checked="@GetCheckedState(tag.Name)"
-                           @onchange="(e) => storeTags(e, tag.Name)" />
-                    <label for="@tag.Name">@tag.Name</label>
+            <div class="tags-container">
+                <label for="tags" class="tags-label">Tags</label>
+                <div class="checkbox-group">
+                    @foreach (var tag in _tags)
+                    {
+                        <div class="checkbox-item">
+                            <input type="checkbox"
+                                   id="@tag.Name"
+                                   value="@tag.Name"
+                                   checked="@GetCheckedState(tag.Name)"
+                                   @onchange="(e) => storeTags(e, tag.Name)" />
+                            <label for="@tag.Name">@tag.Name</label>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
             <MudTextField Label="Notes" @bind-Value="_newTransaction.Notes" />
         </MudForm>
     </DialogContent>

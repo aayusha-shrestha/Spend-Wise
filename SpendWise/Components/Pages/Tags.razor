@@ -1,11 +1,13 @@
 ﻿@page "/tags"
 
-<nav class="navbar navbar-light bg-light justify-content-between">
-    <h1 class="navbar-brand mb-0 h1">Tags</h1>
-    <button class="btn btn-primary" type="button" @onclick="OpenAddTagDialog">
-        <span class="oi oi-plus" /> Add
-    </button>
-</nav>
+<div class="d-flex justify-content-between mt-5 mb-5">
+    <div><h1 class="mb-0 h3">Tags</h1></div>
+    <div>
+        <button class="btn btn-primary" type="button" @onclick="OpenAddTagDialog">
+            <span class="oi oi-plus" /> Add
+        </button>
+    </div>
+</div>
 
 <!--Tags List-->
 <table class="table">
@@ -23,7 +25,7 @@
                 <tr>
                     <td>@tag.Name</td>
                     <td>
-                        <button class="btn btn-outline-danger" type="button">
+                        <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteTagDialog(tag)">
                             <span class="oi oi-delete" /> Delete
                         </button>
                     </td>
@@ -37,7 +39,7 @@
 <!-- Add Tag Dialog -->
 <MudDialog @ref="AddTagDialog">
     <DialogContent>
-        <MudDialogTitle>Add Tag</MudDialogTitle>
+        <MudDialogTitle Style="font-size: 1.5rem;">Add Tag</MudDialogTitle>
         <MudForm @bind-IsValid="IsFormValid" @ref="TagForm">
             <MudTextField Label="Tag" @bind-Value="_newTag.Name" Required="true" />
         </MudForm>
@@ -48,6 +50,18 @@
     </DialogActions>
 </MudDialog>
 <!-- Add Tag Dialog End -->
+
+<!-- Delete Tag Dialog -->
+<MudDialog @ref="DeleteTagDialog">
+    <DialogContent>
+        <MudText Typo="Typo.h6">Are you sure you want to delete this tag?</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Error" OnClick="DeleteTag">Delete</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CancelDeleteDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+<!-- Delete Tag Dialog End -->
 
 <!-- Snack Bar -->
 <MudSnackbarProvider MaxDisplayedSnackbars="3" PreventDuplicates="true" Position="SnackbarPosition.TopCenter" />

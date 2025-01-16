@@ -8,4 +8,5 @@ public interface ITagService
     void SeedDefaultTags(Guid userId, List<Tag> tags);
     List<Tag> GetUserTags(Guid userId);
     void AddCustomTag(Guid userId, Tag newTag);
+    List<Tag> DeleteTag(Guid userId, Guid id);
 }

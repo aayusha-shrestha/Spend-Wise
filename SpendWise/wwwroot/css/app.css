@@ -91,10 +91,10 @@ h1:focus {
     min-height: 100vh;
 }
 
-input:focus{
+input:focus {
     outline: none !important;
     box-shadow: none !important;
-    border: 2px solid palegreen !important;
+    border: 2px solid #d3d3d3 !important;
 }
 
 body{
@@ -198,6 +198,48 @@ body::after {
     border-radius: 12px;
     font-weight: bold;
     text-align: center;
+}
+
+.tags-container {
+    margin: 16px 0px;
+}
+
+.tags-label {
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.checkbox-item label {
+    font-size: 14px !important;
+    cursor: pointer;
+}
+
+.mud-input-control > .mud-input-control-input-container {
+    margin-bottom: 20px !important;
+}
+
+.table > :not(caption) > * > * {
+    padding-top: 1rem !important;
 }
 
 @media (min-width: 641px) {
