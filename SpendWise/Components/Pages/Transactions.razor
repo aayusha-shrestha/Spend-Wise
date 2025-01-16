@@ -30,7 +30,18 @@
             <option value="@tag">@tag</option>
         }
     </select> *@
-    <MudDateRangePicker PickerVariant="@_variant" @bind-DateRange="@_dateRange" Margin="Margin.Dense"/>
+    @* <MudDateRangePicker PickerVariant="@_variant" Margin="Margin.Dense" DateRange="@_dateRange" DateRangeChanged="OnDateRangeChanged" /> *@
+    <MudStack>
+        <MudDateRangePicker @ref="_picker" DateRangeChanged="OnDateRangeChanged"
+                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
+        <PickerActions>
+            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
+            <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@(() => _picker.CloseAsync())">Ok</MudButton>
+        </PickerActions>
+    </MudDateRangePicker>
+</MudStack>
+    @*  <MudDateRangePicker PickerVariant="@_variant" @bind-DateRange="@_dateRange" Margin="Margin.Dense"/> *@
     <input type="date" class="form-control" @onchange="FilterBySpecificDate" />
 </div>
 <!-- Filter Ends -->
@@ -45,7 +56,6 @@
             <th>Amount</th>
             <th>Tag</th>
             <th>Notes</th>
-            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -79,11 +89,6 @@
                     }
                 </td>
                <td>@(string.IsNullOrEmpty(transaction.Notes) ? "N/A" : transaction.Notes)</td>
-                <td>
-                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteTransactionDialog(transaction)">
-                        <span class="oi oi-delete" /> Delete
-                    </button>
-                </td>
             </tr>
         }
     </tbody>

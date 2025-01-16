@@ -1,5 +1,6 @@
 ﻿using SpendWise.Model;
 using SpendWise.Utilities;
+using SpendWise.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -23,7 +24,11 @@ public partial class Transactions : ComponentBase
     private Transaction _transactionToDelete;
     // Date Range
     private PickerVariant _variant = PickerVariant.Dialog;
-    private DateRange _dateRange { get; set; }
+    //private DateRange _dateRange { get; set; }
+    private MudDateRangePicker _picker;
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    private bool _autoClose;
+
     // Error Message
     private string? _errorMessage = "";
 
@@ -159,8 +164,10 @@ public partial class Transactions : ComponentBase
         }
     }
 
-    private void OnDateRangeChanged()
+    // Filter by Date Range
+    private void OnDateRangeChanged(DateRange dateRange)
     {
+        _dateRange = dateRange;
         if (_dateRange.Start.HasValue && _dateRange.End.HasValue)
         {
             _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id)
