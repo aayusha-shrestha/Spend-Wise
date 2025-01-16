@@ -1,17 +1,30 @@
 ﻿@using SpendWise.Model
+
+<style>
+    .navlink .active {
+        background-color: rgba(255,255,255,0.37);
+        color: white;
+    }
+</style>
+
 <div class="top-row ps-3 navbar navbar-light">
     <div class="container-fluid navlink">
-        <NavLink class="navbar-brand" href="/dashboard">
+        <NavLink href="/dashboard" Match="NavLinkMatch.Prefix">
             Dashboard
         </NavLink>
     </div>
     <div class="container-fluid navlink">
-        <NavLink class="navbar-brand" href="/transactions">
+        <NavLink href="/transactions" Match="NavLinkMatch.Prefix">
             Transactions
         </NavLink>
     </div>
     <div class="container-fluid navlink">
-        <NavLink class="navbar-brand" href="/debts">
+        <NavLink href="/debts" Match="NavLinkMatch.Prefix">
+            Tags
+        </NavLink>
+    </div>
+    <div class="container-fluid navlink">
+        <NavLink href="/debts" Match="NavLinkMatch.Prefix">
             Debts
         </NavLink>
     </div>
@@ -36,7 +49,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="HideLogoutConfirmation">No</button>
-                    <button type="button" class="btn btn-primary" @onclick="Logout">Yes</button>
+                    <button type="button" class="btn btn-primary" @onclick="LogoutHandler">Yes</button>
                 </div>
             </div>
         </div>
@@ -57,17 +70,6 @@
     private void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;
-    }
-
-    private void Logout()
-    {
-        if (_globalState != null)
-        {
-            _globalState.CurrentUser = null;
-        }
-        Nav.NavigateTo("/login");
-        StateHasChanged();
-        HideLogoutConfirmation();
     }
 
     private void ShowLogoutConfirmation()

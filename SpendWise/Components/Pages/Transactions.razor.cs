@@ -1,4 +1,5 @@
 ﻿using SpendWise.Model;
+using SpendWise.Utilities;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -9,9 +10,8 @@ public partial class Transactions : ComponentBase
     [CascadingParameter]
     private GlobalState _globalState { get; set; }
     private List<Transaction> _transactions { get; set; }
-    private string _tabFilter = "All";
-    private string _sortBy = "createdAt";
-    private string _sortDirection = "ascending";
+    private string _balance { get; set; }
+
     // Add Transaction
     private Transaction _newTransaction = new Transaction();
     private bool IsFormValid;
@@ -23,6 +23,8 @@ public partial class Transactions : ComponentBase
     // Date Range
     private PickerVariant _variant = PickerVariant.Dialog;
     private DateRange _dateRange { get; set; }
+    // Error Message
+    private string? _errorMessage = "";
 
     protected override void OnInitialized()
     {
@@ -31,6 +33,24 @@ public partial class Transactions : ComponentBase
             Nav.NavigateTo("/login");
         }
         _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+        GetUserBalance();
+    }
+
+    // Get current balance of user
+    private async void GetUserBalance()
+    {
+        try
+        {
+            if (_globalState?.CurrentUser != null)
+            {
+                decimal totalBalance = BalanceService.GetBalance(_globalState.CurrentUser.Id);
+                _balance = Utils.GetFormattedAmount(totalBalance, _globalState.CurrentUser.Currency);
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Error fetching balance.";
+        }
     }
 
     // Search by title
@@ -127,12 +147,47 @@ public partial class Transactions : ComponentBase
 
     private void SaveTransaction()
     {
-        if (!IsFormValid) return;
+        try
+        {
+            if (!IsFormValid) return;
 
-        TransactionService.CreateTransaction(_globalState.CurrentUser.Id, _newTransaction);
-        _transactions.Add(_newTransaction);
-        AddTransactionDialog.CloseAsync();
+            if (_newTransaction == null) return;
+
+            if (_globalState.CurrentUser != null)
+            {
+                decimal totalBalance = BalanceService.GetBalance(_globalState.CurrentUser.Id);
+
+                if (_newTransaction.Type == TransactionType.Debit)
+                {
+                    // Validate balance for debit transactions
+                    if (_newTransaction.Amount > totalBalance)
+                    {
+                        _errorMessage = "You do not have sufficient balance for this debit transaction.";
+                        Snackbar.Add(_errorMessage, Severity.Error);
+                        return;
+                    }
+                    else
+                    {
+                        TransactionService.CreateTransaction(_globalState.CurrentUser.Id, _newTransaction);
+                        _transactions.Add(_newTransaction);
+                    }
+                }
+                else if (_newTransaction.Type == TransactionType.Credit)
+                {
+                    // Add the transaction for credit transactions
+                    TransactionService.CreateTransaction(_globalState.CurrentUser.Id, _newTransaction);
+                    _transactions.Add(_newTransaction);
+                }
+
+                AddTransactionDialog.CloseAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while processing the transaction.", ex);
+        }
     }
+
 
     // Delete Transaction
     private async void OpenDeleteTransactionDialog(Transaction transaction)

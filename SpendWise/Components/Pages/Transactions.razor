@@ -7,6 +7,8 @@
     </button>
 </nav>
 
+<h2>Current Balance: @_balance</h2>
+
 <!-- Filter -->
 <div class="d-flex align-items-center gap-3">
     <input type="search" class="form-control search" placeholder="Search by title" @oninput="SearchTransactionTitle" />
@@ -94,3 +96,5 @@
     </DialogActions>
 </MudDialog>
 <!-- Delete Transaction Dialog End -->
+
+<MudSnackbarProvider MaxDisplayedSnackbars="3" PreventDuplicates="true" Position="SnackbarPosition.TopCenter" />

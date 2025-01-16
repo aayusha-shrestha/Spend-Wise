@@ -7,17 +7,25 @@ namespace SpendWise.Components.Pages;
 
 public partial class Dashboard :ComponentBase
 {
+    private int Index = -1;
+    public List<ChartSeries> Series = new List<ChartSeries>();
+    public string[] XAxisLabels = { "Inflow", "Outflow", "Debt" };
+
     [CascadingParameter]
     private GlobalState _globalState { get; set; }
     private List<User> users = new List<User>();
     private string Message = string.Empty;
-    private string _balance { get; set; }
-    private decimal _totalInflow { get; set; }
-    private decimal _totalOutflow { get; set; }
-    private decimal _totalPendingDebt { get; set; }
-    private decimal _totalClearedDebt { get; set; }
     private List<Debt> _pendingDebts { get; set; }
-    // Highest Transaction
+    // Dashboard Statistics
+    private string _balance { get; set; }
+    private string _totalInflow { get; set; }
+    private string _totalOutflow { get; set; }
+    private string _totalPendingDebt { get; set; }
+    private string _totalClearedDebt { get; set; }
+    private decimal _totalTransactionCount { get; set; }
+    // Highest, Lowest, Total Transaction and Debt
+
+    // Five Highest Transaction
     private List<Transaction> _fiveHighestTransaction { get; set; }
     // Pending Debt
     private List<Debt> _debts { get; set; }
@@ -34,6 +42,12 @@ public partial class Dashboard :ComponentBase
         CalculateDebt();
         GetTopFiveHighestTransactions();
         GetPendingDebts();
+        Series = new List<ChartSeries>
+        {
+            new ChartSeries { Name = "Highest", Data = new double[] { (double)920, (double)960, (double)320 } },
+            new ChartSeries { Name = "Lowest", Data = new double[] { (double)440, (double)160, (double)50 } },
+            new ChartSeries { Name = "Total", Data = new double[] { (double)1360, (double)1120, (double)370 } },
+        };
     }
 
     private async Task<List<User>> GetAllUsers()
@@ -83,12 +97,16 @@ public partial class Dashboard :ComponentBase
                 var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
                 if (allTransactions != null)
                 {
-                    _totalInflow = allTransactions
+                    decimal totalInflow = allTransactions
                         .Where(t => t.Type == TransactionType.Credit)
                         .Sum(t => t.Amount);
-                    _totalOutflow = allTransactions
+                    decimal totalOutflow = allTransactions
                         .Where(t => t.Type == TransactionType.Debit)
                         .Sum(t => t.Amount);
+                    _totalTransactionCount = allTransactions.Count();
+
+                    _totalInflow = Utils.GetFormattedAmount(totalInflow, _globalState.CurrentUser.Currency);
+                    _totalOutflow = Utils.GetFormattedAmount(totalOutflow, _globalState.CurrentUser.Currency);
                 }
             }
         }
@@ -108,12 +126,14 @@ public partial class Dashboard :ComponentBase
                 var allDebts = DebtService.GetAllDebts(_globalState.CurrentUser.Id);
                 if (allDebts != null)
                 {
-                    _totalPendingDebt = allDebts
+                    decimal totalPendingDebt = allDebts
                         .Where(t => t.Status == DebtStatus.Pending)
                         .Sum(t => t.Amount);
-                    _totalClearedDebt = allDebts
+                    decimal totalClearedDebt = allDebts
                         .Where(t => t.Status == DebtStatus.Cleared)
                         .Sum(t => t.Amount);
+                    _totalPendingDebt = Utils.GetFormattedAmount(totalPendingDebt, _globalState.CurrentUser.Currency);
+                    _totalClearedDebt = Utils.GetFormattedAmount(totalClearedDebt, _globalState.CurrentUser.Currency);
                 }
             }
         }
@@ -122,6 +142,8 @@ public partial class Dashboard :ComponentBase
             Message = $"Error calculating: {ex.Message}";
         }
     }
+
+    // CalculateTransactionAndDebtStats
 
     // pending debts
     private async void GetPendingDebts()

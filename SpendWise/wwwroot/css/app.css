@@ -80,7 +80,8 @@ h1:focus {
         z-index: 1;
     }
 
-    .flex-column, .navbar-brand {
+    .flex-column, .
+    {
         padding-left: env(safe-area-inset-left);
     }
 }

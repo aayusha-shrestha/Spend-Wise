@@ -1,12 +1,60 @@
-﻿@page "/dashboard"
+﻿@using System.Globalization
+@using MudBlazor
+
+@page "/dashboard"
 
 Welcome @_globalState?.CurrentUser?.Username!
 
-<h2>Current Balance: @_balance</h2>
-<h2>Total Inflow: @_totalInflow</h2>
-<h2>Total Outflow: @_totalOutflow</h2>
-<h2>Pending Debt: @_totalPendingDebt</h2>
-<h2>Cleared Debt: @_totalClearedDebt</h2>
+<!-- Dashboard Statistics -->
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center">@_balance</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Current Balance</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center">@_totalTransactionCount</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Total Number Of Transaction</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Success">@_totalInflow</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Total Inflow</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Error">@_totalOutflow</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Total Outflow</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Error">@_totalPendingDebt</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Pending Debt</MudText>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" lg="3">
+            <MudCard Class="pa-2 fixed-height-card d-flex justify-center align-center">
+                <MudText Typo="Typo.h6" Align="Align.Center">@_totalClearedDebt</MudText>
+                <MudText Typo="Typo.caption" Align="Align.Center">Cleared Debt</MudText>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+<!-- Dashboard Statistics End -->
+
+<!-- Bar Chart -->
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudText Typo="Typo.h6" Class="mb-2 mt-4">Top Inflows, Outflows, and Debts</MudText>
+    <MudChart ChartType="ChartType.Bar" ChartSeries="@Series" @bind-SelectedIndex="Index" XAxisLabels="@XAxisLabels" Width="100%" Height="350px">
+    </MudChart>
+</MudContainer>
+<!-- Bar Chart End -->
 
 <!-- Top 5 Highest Transaction -->
 <h2>Top 5 Highest Transaction</h2>
@@ -28,7 +76,12 @@ Welcome @_globalState?.CurrentUser?.Username!
                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                 <td>@transaction.Title</td>
                 <td>@transaction.Type</td>
-                <td>@Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    @if (_globalState?.CurrentUser != null)
+                    {
+                        @Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)
+                    }
+                </td>
                 <td>@transaction.Tags</td>
                 <td>@transaction.Notes</td>
             </tr>
@@ -55,11 +108,15 @@ Welcome @_globalState?.CurrentUser?.Username!
             <tr>
                 <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>@debt.SourceOfDebt</td>
-                <td>@Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    @if (_globalState?.CurrentUser != null)
+                    {
+                        @Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)
+                    }
+                </td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
                 </td>
-
                 <td>
                     @if (debt.Status == 0)
                     {

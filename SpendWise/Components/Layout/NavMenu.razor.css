@@ -95,3 +95,12 @@
         overflow-y: auto;
     }
 }
+
+/*.navbar-brand.active {
+    font-weight: bold;
+    color: #007bff;
+}*/
+/*.navlink .active {
+    background-color: rgba(255,255,255,0.37);
+    color: white;
+}*/

@@ -9,6 +9,11 @@ namespace SpendWise.Components.Layout
         //private GlobalState _globalState { get; set; }
         private GlobalState _globalState = new GlobalState();
 
+        private void OnInitialized()
+        {
+            Console.WriteLine(_globalState);
+        }
+
         private void LogoutHandler()
         {
             if (_globalState?.CurrentUser != null)

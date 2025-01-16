@@ -13,7 +13,7 @@
     @if (_globalState?.CurrentUser != null)
     {
         <div class="sidebar">
-            <NavMenu/>
+            <NavMenu LogoutHandler="LogoutHandler" />
         </div>
     }
     <main class="@(_globalState?.CurrentUser == null ? "" : "mainBody")" >
