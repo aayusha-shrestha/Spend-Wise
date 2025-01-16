@@ -242,6 +242,10 @@ body::after {
     padding-top: 1rem !important;
 }
 
+.custom-width .mud-input-control > .mud-input-control-input-container {
+    width: 250px !important;
+}
+
 @media (min-width: 641px) {
     .sidebar[b-x3w255l8z3] {
         height: auto !important;

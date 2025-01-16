@@ -168,7 +168,11 @@ public partial class Transactions : ComponentBase
     private void OnDateRangeChanged(DateRange dateRange)
     {
         _dateRange = dateRange;
-        if (_dateRange.Start.HasValue && _dateRange.End.HasValue)
+        if (dateRange == null)
+        {
+            _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+        }
+        else if (_dateRange.Start.HasValue && _dateRange.End.HasValue)
         {
             _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id)
                 .Where(t => t.CreatedAt.Date >= _dateRange.Start.Value.Date && t.CreatedAt.Date <= _dateRange.End.Value.Date)

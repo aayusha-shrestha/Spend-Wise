@@ -13,8 +13,9 @@
 
 <!-- Filter -->
 <div class="d-flex align-items-center gap-3">
+    <!-- Search By Title -->
     <input type="search" class="form-control search" placeholder="Search by title" @oninput="SearchTransactionTitle" />
-    <!-- Type Filter -->
+    <!-- Transaction Type Filter -->
     <select class="form-control" @onchange="FilterByTransactionType">
         <option value="">Select Transaction Type</option>
         @foreach (var type in Enum.GetValues(typeof(TransactionType)).Cast<TransactionType>())
@@ -22,27 +23,29 @@
             <option value="@type">@type</option>
         }
     </select>
-    <!-- Tag Filter -->
-    @* <select class="form-control" @onchange="FilterByTag">
+    <!-- Tags Filter -->
+    <select class="form-control" @onchange="FilterByTag">
         <option value="">Select Tag</option>
-        @foreach (var tag in Enum.GetValues(typeof(DefaultTag)).Cast<DefaultTag>())
+        @foreach (var tag in _tags)
         {
-            <option value="@tag">@tag</option>
+            <option value="@tag.Name">@tag.Name</option>
         }
-    </select> *@
-    @* <MudDateRangePicker PickerVariant="@_variant" Margin="Margin.Dense" DateRange="@_dateRange" DateRangeChanged="OnDateRangeChanged" /> *@
+    </select>
+    <!-- Date Filter -->
+    <input type="date" class="form-control" placeholder="Select Date" @onchange="FilterBySpecificDate" />
+</div>
+<div class="mt-5 ml-2">
+    <!-- Date Range Filter -->
     <MudStack>
         <MudDateRangePicker @ref="_picker" DateRangeChanged="OnDateRangeChanged"
-                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog">
+                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog" Class="custom-width" Label="Select Date Range">
         <PickerActions>
             <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
             <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton>
             <MudButton Color="Color.Primary" OnClick="@(() => _picker.CloseAsync())">Ok</MudButton>
         </PickerActions>
-    </MudDateRangePicker>
-</MudStack>
-    @*  <MudDateRangePicker PickerVariant="@_variant" @bind-DateRange="@_dateRange" Margin="Margin.Dense"/> *@
-    <input type="date" class="form-control" @onchange="FilterBySpecificDate" />
+        </MudDateRangePicker>
+    </MudStack>
 </div>
 <!-- Filter Ends -->
 
