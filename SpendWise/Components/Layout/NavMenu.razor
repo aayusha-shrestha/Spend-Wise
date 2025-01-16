@@ -1,36 +1,50 @@
 ﻿@using SpendWise.Model
 
+
 <style>
     .navlink .active {
-        background-color: rgba(255,255,255,0.37);
-        color: white;
+        background-color: rgb(220 212 212 / 40%);
+        width: 100%;
+    }
+    .navbar-light .navbar-brand {
+        padding: 12px 28px 12px 16px !important;
+    }
+    .navbar-brand { 
+        margin-right: 1rem;
     }
 </style>
 
-<div class="top-row ps-3 navbar navbar-light">
+<div class="ps-3 navbar navbar-light">
     <div class="container-fluid navlink">
-        <NavLink href="/dashboard" Match="NavLinkMatch.Prefix">
+        <NavLink href="/dashboard" class="navbar-brand" Match="NavLinkMatch.Prefix">
             Dashboard
         </NavLink>
     </div>
     <div class="container-fluid navlink">
-        <NavLink href="/transactions" Match="NavLinkMatch.Prefix">
+        <NavLink href="/transactions" class="navbar-brand"  Match="NavLinkMatch.Prefix">
             Transactions
         </NavLink>
     </div>
     <div class="container-fluid navlink">
-        <NavLink href="/debts" Match="NavLinkMatch.Prefix">
+        <NavLink href="/debts" class="navbar-brand" Match="NavLinkMatch.Prefix">
+            Debts
+        </NavLink>
+    </div>
+    <div class="container-fluid navlink">
+        <NavLink href="/tags" class="navbar-brand" Match="NavLinkMatch.Prefix">
             Tags
         </NavLink>
     </div>
     <div class="container-fluid navlink">
-        <NavLink href="/debts" Match="NavLinkMatch.Prefix">
-            Debts
+        <NavLink class="navbar-brand" style="cursor: pointer" @onclick="ShowLogoutConfirmation">
+            Logout
         </NavLink>
     </div>
-    <button class="" @onclick="ShowLogoutConfirmation">
+    @* <div class="container-fluid navlink">
+    <button class="" >
         Logout
     </button>
+    </div> *@
 </div>
 
 @if (IslogOut)

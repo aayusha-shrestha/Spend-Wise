@@ -199,3 +199,9 @@ body::after {
     font-weight: bold;
     text-align: center;
 }
+
+@media (min-width: 641px) {
+    .sidebar[b-x3w255l8z3] {
+        height: auto !important; 
+    }
+}

@@ -53,7 +53,12 @@
                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                 <td>@transaction.Title</td>
                 <td>@transaction.Type</td>
-                <td>@Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    @if (_globalState?.CurrentUser != null)
+                    {
+                        @Utils.GetFormattedAmount(transaction.Amount, _globalState.CurrentUser.Currency)
+                    }
+                </td>
                 <td>@transaction.Tags</td>
                 <td>@transaction.Notes</td>
                 <td>

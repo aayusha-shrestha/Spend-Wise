@@ -178,7 +178,7 @@ public partial class Transactions : ComponentBase
                     TransactionService.CreateTransaction(_globalState.CurrentUser.Id, _newTransaction);
                     _transactions.Add(_newTransaction);
                 }
-
+                GetUserBalance();
                 AddTransactionDialog.CloseAsync();
             }
         }

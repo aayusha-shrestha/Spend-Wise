@@ -24,7 +24,12 @@
             <tr>
                 <td>@debt.DueDate?.ToString("MMM dd, yyyy")</td>
                 <td>@debt.SourceOfDebt</td>
-                <td>@Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)</td>
+                <td>
+                    @if (_globalState?.CurrentUser != null)
+                    {
+                        @Utils.GetFormattedAmount(debt.Amount, _globalState.CurrentUser.Currency)
+                    }
+                </td>
                 <td>
                     <span class="@(debt.Status == 0 ? "status-pending" : "status-cleared")">@debt.Status</span>
                 </td>

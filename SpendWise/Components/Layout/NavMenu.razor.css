@@ -96,6 +96,11 @@
     }
 }
 
+.top-row[b-pih84fnsrm] {
+    height: none !important;
+    background-color: none !important;
+}
+
 /*.navbar-brand.active {
     font-weight: bold;
     color: #007bff;
@@ -103,4 +108,27 @@
 /*.navlink .active {
     background-color: rgba(255,255,255,0.37);
     color: white;
+}*/
+
+
+
+
+
+/*.navlink .active {
+    background-color: rgb(241 237 237 / 40%);
+    height: 3.5rem;
+}*/
+
+/*.navbar-brand {
+    padding-top: .3125rem;
+    padding-bottom: .3125rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    text-decoration: none;
+    white-space: nowrap;
+}*/
+
+/*.top-row[b-pih84fnsrm] {
+    height: 3.5rem;
+    background-color: rgba(0, 0, 0, 0.4);
 }*/
