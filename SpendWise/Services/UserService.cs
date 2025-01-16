@@ -1,6 +1,7 @@
 ﻿using SpendWise.Abstraction;
 using SpendWise.Model;
 using SpendWise.Services.Interface;
+using SpendWise.Utilities;
 using System.Text.Json;
 
 namespace SpendWise.Services;
@@ -55,10 +56,17 @@ public class UserService : UserBase, IUserService
     {
         var loginErrorMessage = "Invalid username or password.";
 
-        // Find the first user in the list that matches the username, if no user matches user will be null
+        // Find the first user in the list that matches the username
         User existingUser = _users.FirstOrDefault(x => x.Username == user.Username);
 
-        return existingUser == null ? throw new Exception(loginErrorMessage) : existingUser;
+        // If user doesn't exist or the password doesn't match, throw an error.
+        if (existingUser == null || !Utils.VerifyHash(user.Password, existingUser.Password))
+        {
+            throw new Exception(loginErrorMessage);
+        }
+
+        // If the username and password match, return the user
+        return existingUser;
     }
 
     // Registers a new user. Returns false if the username already exists, true if registration is successful.
@@ -68,10 +76,13 @@ public class UserService : UserBase, IUserService
         if (_users.Any(u => u.Username == user.Username))
             return false; // Registration failed: user already exists.
 
+        // Hash the user's password
+        user.Password = Utils.GenerateHash(user.Password);
+
         _users.Add(user);
         SaveUsers(_users);
         // Seed the default tags for the user
-        SeedDefaultTags(user.Id); 
+        SeedDefaultTags(user.Id);
         return true;
     }
     private void SeedDefaultTags(Guid userId)

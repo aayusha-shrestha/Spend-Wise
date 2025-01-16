@@ -157,20 +157,20 @@ public partial class Dashboard :ComponentBase
             {
                 // Calculate Inflows
                 var inflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Inflow).ToList();
-                var inflowHighest = inflowTransactions.Max(t => t.Amount);
-                var inflowLowest = inflowTransactions.Min(t => t.Amount);
-                var inflowTotal = inflowTransactions.Sum(t => t.Amount);
+                var inflowHighest = inflowTransactions.Any() ? inflowTransactions.Max(t => t.Amount) : 0;
+                var inflowLowest = inflowTransactions.Any() ? inflowTransactions.Min(t => t.Amount) : 0;
+                var inflowTotal = inflowTransactions.Sum(t => t.Amount); // Sum will return 0 for empty collections
 
                 // Calculate Outflows
                 var outflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Outflow).ToList();
-                var outflowHighest = outflowTransactions.Max(t => t.Amount);
-                var outflowLowest = outflowTransactions.Min(t => t.Amount);
-                var outflowTotal = outflowTransactions.Sum(t => t.Amount);
+                var outflowHighest = outflowTransactions.Any() ? outflowTransactions.Max(t => t.Amount) : 0;
+                var outflowLowest = outflowTransactions.Any() ? outflowTransactions.Min(t => t.Amount) : 0;
+                var outflowTotal = outflowTransactions.Sum(t => t.Amount); // Sum will return 0 for empty collections
 
                 // Calculate Debts
                 var allDebts = DebtService.GetAllDebts(_globalState.CurrentUser.Id);
-                var debtHighest = allDebts?.Max(d => d.Amount) ?? 0;
-                var debtLowest = allDebts?.Min(d => d.Amount) ?? 0;
+                var debtHighest = allDebts?.Any() == true ? allDebts.Max(d => d.Amount) : 0;
+                var debtLowest = allDebts?.Any() == true ? allDebts.Min(d => d.Amount) : 0;
                 var debtTotal = allDebts?.Sum(d => d.Amount) ?? 0;
 
                 // Update chart data
