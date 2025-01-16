@@ -2,7 +2,7 @@
 
 public enum TransactionType
 {
-    Credit, 
-    Debit,
+    Inflow, 
+    Outflow,
     Debt
 }

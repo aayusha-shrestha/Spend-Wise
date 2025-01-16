@@ -53,7 +53,18 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Date</th>
+            <th @onclick="SortByDate" style="cursor: pointer;">
+                Date
+               @if (_isSortedAscending)
+               {
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowUpward" Size="Size.Small" />
+               }
+               else
+               {
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowDownward" Size="Size.Small" />
+               }
+            </th>
+            @* <th>Date</th> *@
             <th>Title</th>
             <th>Transaction Type</th>
             <th>Amount</th>
@@ -106,8 +117,8 @@
             <MudTextField Label="Title" @bind-Value="_newTransaction.Title" Required="true" />
             <MudNumericField Label="Amount" @bind-Value="_newTransaction.Amount" Required="true" Min="0" />
             <MudSelect Label="Transaction Type" @bind-Value="_newTransaction.Type" Required="true">
-                <MudSelectItem Value="TransactionType.Credit">Credit</MudSelectItem>
-                <MudSelectItem Value="TransactionType.Debit">Debit</MudSelectItem>
+                <MudSelectItem Value="TransactionType.Inflow">Inflow</MudSelectItem>
+                <MudSelectItem Value="TransactionType.Outflow">Outflow</MudSelectItem>
             </MudSelect>
             <div class="tags-container">
                 <label for="tags" class="tags-label">Tags</label>

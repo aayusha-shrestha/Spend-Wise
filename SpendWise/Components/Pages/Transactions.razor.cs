@@ -23,12 +23,10 @@ public partial class Transactions : ComponentBase
     private MudDialog DeleteTransactionDialog;
     private Transaction _transactionToDelete;
     // Date Range
-    private PickerVariant _variant = PickerVariant.Dialog;
-    //private DateRange _dateRange { get; set; }
     private MudDateRangePicker _picker;
-    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
     private bool _autoClose;
-
+    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    private bool _isSortedAscending = true;
     // Error Message
     private string? _errorMessage = "";
 
@@ -40,10 +38,27 @@ public partial class Transactions : ComponentBase
         }
         if (_globalState?.CurrentUser != null)
         {
-            _transactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+            var allTransactions = TransactionService.GetAllTransactions(_globalState.CurrentUser.Id);
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+            _transactions = allTransactions.Where(t => t.CreatedAt.Month == currentMonth && t.CreatedAt.Year == currentYear).ToList();
         }
         GetUserBalance();
         GetUserTags();
+    }
+
+    // Sort Transactions By Date
+    private void SortByDate()
+    {
+        if (_isSortedAscending)
+        {
+            _transactions = _transactions.OrderBy(t => t.CreatedAt).ToList();
+        }
+        else
+        {
+            _transactions = _transactions.OrderByDescending(t => t.CreatedAt).ToList();
+        }
+        _isSortedAscending = !_isSortedAscending;
     }
 
     // Get the checked state for each tag
@@ -207,7 +222,7 @@ public partial class Transactions : ComponentBase
             {
                 decimal totalBalance = BalanceService.GetBalance(_globalState.CurrentUser.Id);
 
-                if (_newTransaction.Type == TransactionType.Debit)
+                if (_newTransaction.Type == TransactionType.Outflow)
                 {
                     // Validate balance for debit transactions
                     if (_newTransaction.Amount > totalBalance)
@@ -222,9 +237,9 @@ public partial class Transactions : ComponentBase
                         _transactions.Add(_newTransaction);
                     }
                 }
-                else if (_newTransaction.Type == TransactionType.Credit)
+                else if (_newTransaction.Type == TransactionType.Inflow)
                 {
-                    // Add the transaction for credit transactions
+                    // Add the transaction for inflow transactions
                     TransactionService.CreateTransaction(_globalState.CurrentUser.Id, _newTransaction);
                     _transactions.Add(_newTransaction);
                 }

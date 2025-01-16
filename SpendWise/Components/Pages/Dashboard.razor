@@ -71,7 +71,20 @@
 <!-- Bar Chart End -->
 
 <!-- Top 5 Highest Transaction -->
-<h4 style="margin-top: 3rem;">Top 5 Highest Transaction</h4>
+<div class="d-flex justify-content-between align-items-end" style="margin-top: 3rem;">
+<h4 class="mt-0 pb-3">Top 5 Highest Transaction</h4>
+<!-- Date Range Filter -->
+    <MudStack>
+        <MudDateRangePicker @ref="_picker" DateRangeChanged="OnDateRangeChanged"
+                        AutoClose="@_autoClose" PickerVariant="PickerVariant.Dialog" Class="custom-width" Label="Select Date Range">
+        <PickerActions>
+            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _picker.ClearAsync())">Clear</MudButton>
+            <MudButton OnClick="@(() => _picker.CloseAsync(false))">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@(() => _picker.CloseAsync())">Ok</MudButton>
+        </PickerActions>
+        </MudDateRangePicker>
+    </MudStack>
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -121,8 +134,21 @@
 <!-- Top 5 Highest Transaction End -->
 
 <!--Pending Debt List-->
-<h4 style="margin-top: 3rem;">Pending Debts</h4>
-<table class="table">
+<div class="d-flex justify-content-between align-items-end" style="margin-top: 3rem;">
+    <h4 class="mt-0 pb-3">Pending Debts</h4>
+<!-- Date Range Filter -->
+    <MudStack>
+        <MudDateRangePicker @ref="_pickerDebt" DateRangeChanged="OnPendingDateRangeChanged"
+                        AutoClose="@_autoCloseDebt" PickerVariant="PickerVariant.Dialog" Class="custom-width" Label="Select Date Range">
+        <PickerActions>
+            <MudButton Class="mr-auto align-self-start" OnClick="@(() => _pickerDebt.ClearAsync())">Clear</MudButton>
+            <MudButton OnClick="@(() => _pickerDebt.CloseAsync(false))">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@(() => _pickerDebt.CloseAsync())">Ok</MudButton>
+        </PickerActions>
+        </MudDateRangePicker>
+    </MudStack>
+</div>
+<table class="table pb-5">
     <thead>
         <tr>
             <th>Date</th>
@@ -142,7 +168,7 @@
         {
             <tr>
                 <td>@debt.CreatedAt.ToString("MMM dd, yyyy")</td>
-                <td>@debt.SourceOfDebt</td>
+                <td>@debt.Title</td>
                 <td>@debt.Type</td>
                 <td>
                     @if (_globalState?.CurrentUser != null)

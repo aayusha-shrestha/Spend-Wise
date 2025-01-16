@@ -26,11 +26,11 @@ public class BalanceService: IBalanceService
         {
             switch (transaction.Type)
             {
-                case TransactionType.Credit:
+                case TransactionType.Inflow:
                     totalBalance += transaction.Amount;
                     break;
 
-                case TransactionType.Debit:
+                case TransactionType.Outflow:
                     totalBalance -= transaction.Amount;
                     break;
             }

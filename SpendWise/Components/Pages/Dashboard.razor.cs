@@ -29,6 +29,13 @@ public partial class Dashboard :ComponentBase
     private List<Debt> _debts { get; set; }
     private MudDialog ClearDebtDialog;
     private Debt _debtToClear;
+    // Date Range Filter
+    private MudDateRangePicker _picker;
+    private bool _autoClose;
+    private DateRange _dateRangeTransaction = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
+    private MudDateRangePicker _pickerDebt;
+    private bool _autoCloseDebt;
+    private DateRange _dateRangeDebt = new DateRange(DateTime.Now.Date, DateTime.Now.AddDays(5).Date);
     // Error Message
     private string? _errorMessage = "";
 
@@ -91,10 +98,10 @@ public partial class Dashboard :ComponentBase
                 if (allTransactions != null)
                 {
                     decimal totalInflow = allTransactions
-                        .Where(t => t.Type == TransactionType.Credit)
+                        .Where(t => t.Type == TransactionType.Inflow)
                         .Sum(t => t.Amount);
                     decimal totalOutflow = allTransactions
-                        .Where(t => t.Type == TransactionType.Debit)
+                        .Where(t => t.Type == TransactionType.Outflow)
                         .Sum(t => t.Amount);
                     _totalTransactionCount = allTransactions.Count();
 
@@ -138,7 +145,7 @@ public partial class Dashboard :ComponentBase
         }
     }
 
-    // Gennerate Chart Data
+    // Generate Chart Data
     private void GenerateChartData()
     {
         if (_globalState?.CurrentUser != null)
@@ -149,13 +156,13 @@ public partial class Dashboard :ComponentBase
             if (allTransactions != null)
             {
                 // Calculate Inflows
-                var inflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Credit).ToList();
+                var inflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Inflow).ToList();
                 var inflowHighest = inflowTransactions.Max(t => t.Amount);
                 var inflowLowest = inflowTransactions.Min(t => t.Amount);
                 var inflowTotal = inflowTransactions.Sum(t => t.Amount);
 
                 // Calculate Outflows
-                var outflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Debit).ToList();
+                var outflowTransactions = allTransactions.Where(t => t.Type == TransactionType.Outflow).ToList();
                 var outflowHighest = outflowTransactions.Max(t => t.Amount);
                 var outflowLowest = outflowTransactions.Min(t => t.Amount);
                 var outflowTotal = outflowTransactions.Sum(t => t.Amount);
@@ -180,7 +187,7 @@ public partial class Dashboard :ComponentBase
         }
     }
 
-    // pending debts
+    // Get Pending debts
     private async void GetPendingDebts()
     {
         if (_globalState?.CurrentUser != null)
@@ -255,6 +262,46 @@ public partial class Dashboard :ComponentBase
         catch (Exception ex)
         {
             Message = $"Error fetching top transactions: {ex.Message}";
+        }
+    }
+
+    // Filter Top 5 Highest Transactions by Date Range
+    private void OnDateRangeChanged(DateRange dateRange)
+    {
+        _dateRangeTransaction = dateRange;
+        if (dateRange == null)
+        {
+            GetTopFiveHighestTransactions();
+        }
+        else if (_dateRangeTransaction.Start.HasValue && _dateRangeTransaction.End.HasValue)
+        {
+            _fiveHighestTransaction = _fiveHighestTransaction
+                .Where(t => t.CreatedAt.Date >= _dateRangeTransaction.Start.Value.Date && t.CreatedAt.Date <= _dateRangeTransaction.End.Value.Date)
+                .ToList();
+        }
+        else
+        {
+            GetTopFiveHighestTransactions();
+        }
+    }
+
+    // Filter Pending Debts by Date Range
+    private void OnPendingDateRangeChanged(DateRange dateRange)
+    {
+        _dateRangeDebt = dateRange;
+        if (dateRange == null)
+        {
+            GetPendingDebts();
+        }
+        else if (_dateRangeDebt.Start.HasValue && _dateRangeDebt.End.HasValue)
+        {
+            _pendingDebts = _pendingDebts
+                .Where(t => t.DueDate?.Date >= _dateRangeDebt.Start.Value.Date && t.DueDate?.Date <= _dateRangeDebt.End.Value.Date)
+                .ToList();
+        }
+        else
+        {
+            GetPendingDebts();
         }
     }
 }
