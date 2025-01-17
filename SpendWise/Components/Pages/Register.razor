@@ -21,6 +21,10 @@
         <MudSelectItem Value="@currency">@currency</MudSelectItem>
     }
     </MudSelect>
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="alert alert-danger">@Message</div>
+        }
     <button class="btn btn-lg btn-primary">
         Register
     </button>
@@ -28,11 +32,6 @@
         Login
     </button>
     </form>
-   
-    @if (!string.IsNullOrEmpty(Message))
-    {
-        <div class="text-info mt-3">@Message</div>
-    }
 </div>
 
 
